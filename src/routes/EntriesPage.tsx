@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { AddEntryModal } from '../components/AddEntryModal'
 import { listTimeEntries } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { formatDuration, today } from '../lib/format'
@@ -7,7 +8,9 @@ import { formatDuration, today } from '../lib/format'
 export function EntriesPage() {
   const { credentials, logout } = useAuth()
   const personId = credentials!.personId
+  const queryClient = useQueryClient()
   const [date, setDate] = useState(() => today())
+  const [isAddOpen, setIsAddOpen] = useState(false)
 
   const {
     data: entries,
@@ -55,11 +58,20 @@ export function EntriesPage() {
               className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm outline-none focus:border-neutral-500"
             />
           </label>
-          {isFetching && !isPending && (
-            <span className="text-xs text-neutral-400" aria-live="polite">
-              Updating…
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            {isFetching && !isPending && (
+              <span className="text-xs text-neutral-400" aria-live="polite">
+                Updating…
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => setIsAddOpen(true)}
+              className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700"
+            >
+              + Add time entry
+            </button>
+          </div>
         </div>
 
         <div className="mt-4">
@@ -89,6 +101,19 @@ export function EntriesPage() {
           )}
         </div>
       </main>
+
+      {isAddOpen && (
+        <AddEntryModal
+          personId={personId}
+          defaultDate={date}
+          onClose={() => setIsAddOpen(false)}
+          onCreated={(created) => {
+            setDate(created.date)
+            queryClient.invalidateQueries({ queryKey: ['time-entries', personId, created.date] })
+            setIsAddOpen(false)
+          }}
+        />
+      )}
     </div>
   )
 }

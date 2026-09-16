@@ -57,7 +57,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
       clearCredentials()
       window.dispatchEvent(new Event(AUTH_INVALIDATED_EVENT))
     }
-    throw new ApiError(`Productive API error (${response.status})`, response.status, body)
+    throw ApiError.fromResponse(response.status, body)
   }
 
   return body as T

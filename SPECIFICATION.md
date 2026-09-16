@@ -98,6 +98,30 @@ Verified empirically: `api.productive.io` returns permissive CORS headers and ac
     - `networkMode: 'always'` overrides the default behavior of *pausing* (not failing) queries while the browser reports offline. The default seemed reasonable until testing it directly (via DevTools' offline throttle): no error, no network request, no feedback at all beyond an indefinitely-stuck loading state - only resolving silently once connectivity returned. Since the assignment explicitly wants "an appropriate error" on load failure, and offline is a real way loading can fail for a user, `'always'` forces the real `fetch()` attempt so a genuine connectivity failure surfaces through the same error+retry UI as any other failure, rather than being a special silent case.
   - Duration is rendered as `Xh Ym` (`src/lib/format.ts`) rather than raw minutes.
   - `note` is normalized to plain text at the API layer (`stripHtml` in `src/lib/html.ts`, applied in `timeEntries.ts`'s response mapping), not just at display time - Productive's own rich-text editor stores descriptions as HTML (e.g. `<ul><li><p>text</p></li></ul>`), which rendered as literal tag characters before this fix. Normalizing at the API boundary means every consumer (this list, and the edit form's pre-filled textarea later) gets clean text automatically. Each `<li>` is prefixed with `• ` before the HTML is stripped, so list structure survives as plain-text bullets rather than disappearing into unmarked lines.
+- **`AddEntryModal`** (`src/components/AddEntryModal.tsx`) — opened via a "+ Add time entry" button on `EntriesPage`; a modal rather than its own route, since only *editing* has the explicit "own route" requirement from the assignment. Defaults its date field to whichever date is currently selected on the list. On success, the list's selected date switches to match the created entry's actual date (from the server response, not the form's local state) and that date's query is invalidated - so the new entry is immediately visible even if it was created for a date other than the one currently being viewed.
+
+  **Duration input** (`src/components/DurationInput.tsx` + `src/lib/duration.ts`) - a free-form text field accepting either a single magnitude-interpreted number, or literal `HH:MM`:
+  - `< 10` → hours (e.g. `1` → `1h`; `1.5` → `1h 30min`)
+  - `>= 10` and a whole number → minutes (e.g. `11` → `11 min`)
+  - `>= 10` and fractional → hours (e.g. `11.37` → `11h 22min`)
+  - Capped at 24h (1440 min) total regardless of which branch produced it, shown as a distinct red error rather than folded into the neutral `--:--` empty/unparseable state.
+  - Empty or unparseable input shows `--:--` in neutral styling - not treated as an error, since it's the natural state before/while typing.
+  - **On blur**, a valid value is rewritten in place to zero-padded `HH:MM` (e.g. `1.5` → `01:30`, `11` → `00:11`) - this is what the `00:00` placeholder was actually hinting at. Invalid or over-24h values are left untouched so the error/`--:--` state stays visible and editable. Since the reformatted value feeds back through the same field, `parseDurationInput` has to understand `HH:MM` as a first-class input style too (checked before the magnitude rules), not just produce it - otherwise blurring would leave the field showing a string its own parser couldn't read back.
+
+  **Note input** (`src/components/NoteInput.tsx`) - a plain `<textarea>` (matching the app's plain-text description decision, see above) with lightweight bullet-list editing layered on top via keyboard handling, since real bullet characters typed into plain text don't need a rich-text editor to look and behave like a list:
+  - Starts pre-filled with `• ` (cursor after it) - a new note defaults to list mode.
+  - Enter on a bullet line with content continues the list (`\n• `).
+  - Enter on an *empty* bullet line strips the bullet instead of adding another blank one - two consecutive Enters exits list mode, matching common note-app conventions (Notion, etc.).
+  - Typing `- ` at the start of an empty line converts it into a bullet, re-entering list mode.
+  - On submit, a note that's still just the default empty bullet (nothing ever typed) is sent as an empty string, not as a stray `•` character.
+
+  **Unsaved-changes guard**: closing the modal (X, Cancel, backdrop click, or Escape - all funnel through one `requestClose`) is immediate if nothing was edited from the initial state (empty duration, default date, empty bullet note), but prompts a `ConfirmDialog` ("Discard changes?" / "Continue editing" / "Discard changes") if any field was touched. `ConfirmDialog` (`src/components/ConfirmDialog.tsx`) is a small generic component, reused as-is rather than one-off inline JSX, since the edit form will need the identical guard.
+
+### API error messages
+
+`ApiError.fromResponse` (`src/lib/api/errors.ts`) parses Productive's JSON:API error body instead of always falling back to a generic `Productive API error (422)` string: it uses `errors[0].detail`/`.title` (prefixed with the offending field, read from `source.pointer`) when present, with a small override map for specific error codes whose raw `detail` reads too tersely out of context. Currently one entry: `time_entry_salary_not_defined` (Productive rejects time entries dated before a person's salary/cost-rate record starts) becomes "This date is before your cost rate was set up in Productive, so time can't be tracked for it." instead of just the field name and "has no salary defined."
+
+This is reactive (shown on a failed submit) rather than proactive. Productive's own UI proactively restricts the date picker using a `GET /api/v2/salaries?filter[person_id]=<id>` lookup (the `started_on` of the person's active salary/cost-rate record - not exposed anywhere on the Person resource itself). Deliberately not implemented here: it's an extra API call and extra UI state for a case the assignment's acceptance criteria already consider handled ("Validation and API errors are shown if creation fails") - the reactive error message satisfies that without the added scope.
 
 ## 7. What's tested / not tested
 
