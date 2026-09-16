@@ -67,6 +67,16 @@ The API stores `time` as an integer number of minutes. The UI form will collect 
 
 Productive's own UI stores `note` as HTML (its editor is rich-text). The API does not require HTML — this app uses a plain `<textarea>` and sends plain text, which is a deliberate simplification given the assignment's 10-hour scope, not an API constraint.
 
+### Client code layout
+
+- `src/lib/auth/storage.ts` — localStorage get/set/clear for `{ apiToken, organizationId, personId }`.
+- `src/lib/api/client.ts` — the single `apiFetch` wrapper: injects auth headers, sets the JSON:API content type, and normalizes non-2xx responses into a typed `ApiError`. Every other API module goes through this rather than calling `fetch` directly.
+- `src/lib/api/organizationMemberships.ts` — resolves `person_id` from a token + organization ID (used at login, before credentials are persisted).
+- `src/lib/api/services.ts` — the `service_id` auto-resolution described above.
+- `src/lib/api/timeEntries.ts` — list/create/update/delete.
+
+**Open item to verify empirically**: `POST`/`PATCH` bodies use `"type": "time-entries"` (hyphenated), confirmed from a captured real create request. `service_suggestions`' actual response shape wasn't captured directly — `resolveServiceId` handles two plausible shapes (a `service` relationship, or the suggestion resource being a `services` resource itself) with a fallback to `/services` if neither matches. This will get exercised for real once the create flow is wired up and tested end-to-end against the test account.
+
 ## 5. CORS
 
 Verified empirically: `api.productive.io` returns permissive CORS headers and accepts authenticated requests from arbitrary third-party origins (tested from an unrelated localhost origin), which is what makes the "client-side only, no backend" architecture viable at all.
