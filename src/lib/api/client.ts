@@ -1,8 +1,11 @@
 import type { AuthCredentials } from '../auth/storage'
-import { loadCredentials } from '../auth/storage'
+import { clearCredentials, loadCredentials } from '../auth/storage'
 import { ApiError } from './errors'
 
 const BASE_URL = 'https://api.productive.io/api/v2'
+
+/** Dispatched when a call using stored credentials gets a 401/403, so AuthProvider can sync its state. */
+export const AUTH_INVALIDATED_EVENT = 'productive-auth:invalidated'
 
 export type ApiAuth = Pick<AuthCredentials, 'apiToken' | 'organizationId'>
 
@@ -12,6 +15,9 @@ interface RequestOptions {
   query?: Record<string, string>
   /** Explicit credentials, for calls made before login (e.g. token validation) that can't read from storage. */
   auth?: ApiAuth
+  /** Skip auto-logout-on-401/403 - for login-time calls where nothing is stored yet, so a bad
+   * token just means "invalid credentials," not "existing session expired." */
+  skipSessionInvalidation?: boolean
 }
 
 function buildUrl(path: string, query?: Record<string, string>): string {
@@ -45,6 +51,12 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
   const body = text ? JSON.parse(text) : undefined
 
   if (!response.ok) {
+    // A previously-valid stored token that's now rejected means the session is dead (e.g. token
+    // deleted in Productive) - distinct from a login attempt with a token that was never valid.
+    if (!options.skipSessionInvalidation && (response.status === 401 || response.status === 403)) {
+      clearCredentials()
+      window.dispatchEvent(new Event(AUTH_INVALIDATED_EVENT))
+    }
     throw new ApiError(`Productive API error (${response.status})`, response.status, body)
   }
 

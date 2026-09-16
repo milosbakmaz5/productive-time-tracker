@@ -1,3 +1,4 @@
+import { loadCredentials } from '../auth/storage'
 import type { ApiAuth } from './client'
 import { apiFetch } from './client'
 import { ApiError } from './errors'
@@ -8,16 +9,27 @@ interface OrganizationMembershipAttributes {
 }
 
 /**
- * Resolves the person_id for the current token within the given organization.
- * Called with explicit credentials at login time, before anything is persisted.
+ * Resolves the person_id for an organization membership.
+ * Pass explicit `auth` at login time, before credentials are persisted - a failure there means
+ * "wrong token/org," not "session expired," so it's excluded from the stored-session invalidation
+ * flow. Omit `auth` to re-check the currently stored session instead.
  */
-export async function resolvePersonId(auth: ApiAuth): Promise<string> {
+export async function resolvePersonId(auth?: ApiAuth): Promise<string> {
+  const organizationId = auth?.organizationId ?? loadCredentials()?.organizationId
+  if (!organizationId) {
+    throw new ApiError('Not authenticated', 401)
+  }
+
   const doc = await apiFetch<JsonApiCollectionDocument<OrganizationMembershipAttributes>>(
     '/organization_memberships',
     {
       auth,
+      skipSessionInvalidation: !!auth,
       query: {
-        'filter[organization_id]': auth.organizationId,
+        'filter[organization_id]': organizationId,
+        // Productive omits relationships.person.data entirely unless explicitly included -
+        // without this, "person" comes back as just { meta: { included: false } }.
+        include: 'person',
         per_page: '1',
       },
     },

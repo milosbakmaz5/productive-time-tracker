@@ -1,4 +1,3 @@
-import type { ApiAuth } from './client'
 import { apiFetch } from './client'
 import { ApiError } from './errors'
 import type { JsonApiCollectionDocument } from './types'
@@ -10,13 +9,14 @@ import type { JsonApiCollectionDocument } from './types'
  * the service that person would suggest for that date, matching their own "quick add" flow.
  * Falls back to the first bookable service for that person/date if there's no suggestion.
  */
-export async function resolveServiceId(auth: ApiAuth, personId: string, date: string): Promise<string> {
+export async function resolveServiceId(personId: string, date: string): Promise<string> {
   const suggestions = await apiFetch<JsonApiCollectionDocument<unknown>>('/service_suggestions', {
-    auth,
     query: {
       'filter[person_id]': personId,
       'filter[date][gt_eq]': date,
       'filter[date][lt_eq]': date,
+      // Productive omits relationships.<x>.data unless explicitly included - see organizationMemberships.ts.
+      include: 'service',
       per_page: '1',
     },
   })
@@ -34,7 +34,6 @@ export async function resolveServiceId(auth: ApiAuth, personId: string, date: st
   }
 
   const services = await apiFetch<JsonApiCollectionDocument<unknown>>('/services', {
-    auth,
     query: {
       'filter[time_tracking_enabled]': 'true',
       'filter[bookable_date]': date,

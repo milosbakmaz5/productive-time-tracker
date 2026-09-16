@@ -1,4 +1,3 @@
-import type { ApiAuth } from './client'
 import { apiFetch } from './client'
 import type { JsonApiCollectionDocument, JsonApiDocument } from './types'
 
@@ -25,9 +24,8 @@ function toTimeEntry(resource: { id: string; attributes: TimeEntryAttributes }):
   }
 }
 
-export async function listTimeEntries(auth: ApiAuth, personId: string, date: string): Promise<TimeEntry[]> {
+export async function listTimeEntries(personId: string, date: string): Promise<TimeEntry[]> {
   const doc = await apiFetch<JsonApiCollectionDocument<TimeEntryAttributes>>('/time_entries', {
-    auth,
     query: {
       'filter[person_id]': personId,
       'filter[date]': date,
@@ -46,9 +44,8 @@ export interface CreateTimeEntryInput {
   note: string
 }
 
-export async function createTimeEntry(auth: ApiAuth, input: CreateTimeEntryInput): Promise<TimeEntry> {
+export async function createTimeEntry(input: CreateTimeEntryInput): Promise<TimeEntry> {
   const doc = await apiFetch<JsonApiDocument<TimeEntryAttributes>>('/time_entries', {
-    auth,
     method: 'POST',
     body: {
       data: {
@@ -76,13 +73,8 @@ export interface UpdateTimeEntryInput {
   note: string
 }
 
-export async function updateTimeEntry(
-  auth: ApiAuth,
-  id: string,
-  input: UpdateTimeEntryInput,
-): Promise<TimeEntry> {
+export async function updateTimeEntry(id: string, input: UpdateTimeEntryInput): Promise<TimeEntry> {
   const doc = await apiFetch<JsonApiDocument<TimeEntryAttributes>>(`/time_entries/${id}`, {
-    auth,
     method: 'PATCH',
     body: {
       data: {
@@ -100,9 +92,8 @@ export async function updateTimeEntry(
   return toTimeEntry(doc.data)
 }
 
-export async function deleteTimeEntry(auth: ApiAuth, id: string): Promise<void> {
+export async function deleteTimeEntry(id: string): Promise<void> {
   await apiFetch<void>(`/time_entries/${id}`, {
-    auth,
     method: 'DELETE',
   })
 }

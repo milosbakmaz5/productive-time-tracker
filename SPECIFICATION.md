@@ -77,6 +77,12 @@ Productive's own UI stores `note` as HTML (its editor is rich-text). The API doe
 
 **Open item to verify empirically**: `POST`/`PATCH` bodies use `"type": "time-entries"` (hyphenated), confirmed from a captured real create request. `service_suggestions`' actual response shape wasn't captured directly — `resolveServiceId` handles two plausible shapes (a `service` relationship, or the suggestion resource being a `services` resource itself) with a fallback to `/services` if neither matches. This will get exercised for real once the create flow is wired up and tested end-to-end against the test account.
 
+### Platform quirk: relationships require explicit `include`
+
+Unlike typical JSON:API implementations, Productive does **not** return a relationship's `data` (the related resource's type/id) unless that relationship is explicitly named in the `include` query param — without it, you get `"relationships": { "person": { "meta": { "included": false } } }` with no `data` at all, not even just the identifier. Discovered by testing `GET /organization_memberships` directly: `resolvePersonId` initially failed because it read `relationships.person.data` without requesting `include=person`. Fixed by adding `include=person` (and `include=service` in `resolveServiceId`'s `service_suggestions` call) — confirmed working end-to-end through the login screen against the real test account.
+
+This matters generally: **any** relationship this app ever needs to read off a Productive response must be named in that request's `include` param, even if only the id is needed and the full related resource isn't used.
+
 ## 5. CORS
 
 Verified empirically: `api.productive.io` returns permissive CORS headers and accepts authenticated requests from arbitrary third-party origins (tested from an unrelated localhost origin), which is what makes the "client-side only, no backend" architecture viable at all.
