@@ -1,4 +1,5 @@
 import { apiFetch } from './client'
+import { stripHtml } from '../html'
 import type { JsonApiCollectionDocument, JsonApiDocument } from './types'
 
 interface TimeEntryAttributes {
@@ -20,7 +21,7 @@ function toTimeEntry(resource: { id: string; attributes: TimeEntryAttributes }):
     id: resource.id,
     date: resource.attributes.date,
     time: resource.attributes.time,
-    note: resource.attributes.note ?? '',
+    note: stripHtml(resource.attributes.note ?? ''),
   }
 }
 

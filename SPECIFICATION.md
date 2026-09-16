@@ -89,7 +89,15 @@ Verified empirically: `api.productive.io` returns permissive CORS headers and ac
 
 ## 6. Screens / components
 
-_(To be filled in as built.)_
+- **`LoginPage`** (`/login`) — API token + organization ID form.
+- **`EntriesPage`** (`/`) — lists time entries for a selected date (defaults to today). States:
+  - **Loading**: skeleton placeholders shown on *every* fetch that changes what's on screen - including switching dates, not just the very first load. An earlier version used `placeholderData: keepPreviousData` to avoid a skeleton flash when changing dates, but that meant a different date's stale content (sometimes "no entries") stayed on screen behind a small "Updating…" label, which read as wrong/confusing rather than smooth. Removed in favor of always showing the skeleton for a genuinely new query. A background refetch of the *same* date (e.g. on window refocus) still shows the subtler "Updating…" indicator over the current, still-valid data, since that case isn't misleading.
+  - **Empty**: explicit "No time entries for this date" message, distinct from the error state.
+  - **Error**: shows the failure message with an explicit **Retry** button that re-runs the query.
+    - `retry: false` deliberately disables TanStack Query's default silent retries (3 attempts with exponential backoff) — with an explicit retry control already in the UI, silent auto-retries only added several seconds of delay before a real failure became visible, caught during testing.
+    - `networkMode: 'always'` overrides the default behavior of *pausing* (not failing) queries while the browser reports offline. The default seemed reasonable until testing it directly (via DevTools' offline throttle): no error, no network request, no feedback at all beyond an indefinitely-stuck loading state - only resolving silently once connectivity returned. Since the assignment explicitly wants "an appropriate error" on load failure, and offline is a real way loading can fail for a user, `'always'` forces the real `fetch()` attempt so a genuine connectivity failure surfaces through the same error+retry UI as any other failure, rather than being a special silent case.
+  - Duration is rendered as `Xh Ym` (`src/lib/format.ts`) rather than raw minutes.
+  - `note` is normalized to plain text at the API layer (`stripHtml` in `src/lib/html.ts`, applied in `timeEntries.ts`'s response mapping), not just at display time - Productive's own rich-text editor stores descriptions as HTML (e.g. `<ul><li><p>text</p></li></ul>`), which rendered as literal tag characters before this fix. Normalizing at the API boundary means every consumer (this list, and the edit form's pre-filled textarea later) gets clean text automatically. Each `<li>` is prefixed with `• ` before the HTML is stripped, so list structure survives as plain-text bullets rather than disappearing into unmarked lines.
 
 ## 7. What's tested / not tested
 

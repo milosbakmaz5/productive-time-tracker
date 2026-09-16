@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './lib/auth/AuthContext'
-import { HomePage } from './routes/HomePage'
+import { EntriesPage } from './routes/EntriesPage'
 import { LoginPage } from './routes/LoginPage'
 import { RequireAuth } from './routes/RequireAuth'
 
@@ -13,7 +13,7 @@ function App() {
           path="/"
           element={
             <RequireAuth>
-              <HomePage />
+              <EntriesPage />
             </RequireAuth>
           }
         />
