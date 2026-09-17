@@ -3,12 +3,10 @@ import { useState, type FormEvent } from 'react'
 import { createTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { resolveServiceId } from '../lib/api/services'
 import { parseDurationInput } from '../lib/duration'
+import { EMPTY_NOTE, normalizeNoteForSubmit } from '../lib/note'
 import { ConfirmDialog } from './ConfirmDialog'
-import { DurationInput } from './DurationInput'
+import { EntryFormFields } from './EntryFormFields'
 import { Modal } from './Modal'
-import { NoteInput } from './NoteInput'
-
-const EMPTY_NOTE = '• '
 
 interface AddEntryModalProps {
   personId: string
@@ -40,14 +38,12 @@ export function AddEntryModal({ personId, defaultDate, onClose, onCreated }: Add
         throw new Error('Enter a valid duration.')
       }
       const serviceId = await resolveServiceId(personId, date)
-      // A note left as just the default bullet with nothing typed isn't a real note.
-      const hasRealContent = note.replace(/•/g, '').trim() !== ''
       return createTimeEntry({
         personId,
         serviceId,
         date,
         time: parsedDuration.minutes,
-        note: hasRealContent ? note.trim() : '',
+        note: normalizeNoteForSubmit(note),
       })
     },
     onSuccess: onCreated,
@@ -62,30 +58,14 @@ export function AddEntryModal({ personId, defaultDate, onClose, onCreated }: Add
     <>
       <Modal title="Add time entry" onClose={requestClose}>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block text-sm font-medium text-neutral-700">
-            Duration
-            <div className="mt-1">
-              <DurationInput value={durationText} onChange={setDurationText} />
-            </div>
-          </label>
-
-          <label className="block text-sm font-medium text-neutral-700">
-            Date
-            <input
-              type="date"
-              required
-              value={date}
-              onChange={(event) => setDate(event.target.value)}
-              className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
-            />
-          </label>
-
-          <label className="block text-sm font-medium text-neutral-700">
-            Description
-            <div className="mt-1">
-              <NoteInput value={note} onChange={setNote} />
-            </div>
-          </label>
+          <EntryFormFields
+            durationText={durationText}
+            onDurationChange={setDurationText}
+            date={date}
+            onDateChange={setDate}
+            note={note}
+            onNoteChange={setNote}
+          />
 
           {mutation.isError && (
             <p role="alert" className="text-sm text-red-600">

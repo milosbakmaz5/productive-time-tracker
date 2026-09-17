@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { AddEntryModal } from '../components/AddEntryModal'
 import { listTimeEntries } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
@@ -9,8 +10,18 @@ export function EntriesPage() {
   const { credentials, logout } = useAuth()
   const personId = credentials!.personId
   const queryClient = useQueryClient()
-  const [date, setDate] = useState(() => today())
+  const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const date = searchParams.get('date') ?? today()
   const [isAddOpen, setIsAddOpen] = useState(false)
+
+  function setDate(next: string) {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev)
+      params.set('date', next)
+      return params
+    })
+  }
 
   const {
     data: entries,
@@ -95,6 +106,15 @@ export function EntriesPage() {
                     <span className="text-xs text-neutral-400">{entry.date}</span>
                   </div>
                   {entry.note && <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600">{entry.note}</p>}
+                  <div className="mt-2 flex justify-end">
+                    <Link
+                      to={`/entries/${entry.id}/edit`}
+                      state={{ backgroundLocation: location }}
+                      className="text-xs font-medium text-neutral-500 hover:text-neutral-900"
+                    >
+                      Edit
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>

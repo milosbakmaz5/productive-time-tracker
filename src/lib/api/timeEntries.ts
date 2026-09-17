@@ -25,6 +25,11 @@ function toTimeEntry(resource: { id: string; attributes: TimeEntryAttributes }):
   }
 }
 
+export async function getTimeEntry(id: string): Promise<TimeEntry> {
+  const doc = await apiFetch<JsonApiDocument<TimeEntryAttributes>>(`/time_entries/${id}`)
+  return toTimeEntry(doc.data)
+}
+
 export async function listTimeEntries(personId: string, date: string): Promise<TimeEntry[]> {
   const doc = await apiFetch<JsonApiCollectionDocument<TimeEntryAttributes>>('/time_entries', {
     query: {

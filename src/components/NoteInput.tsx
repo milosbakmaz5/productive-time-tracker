@@ -1,6 +1,5 @@
 import type { ChangeEvent, KeyboardEvent } from 'react'
-
-const BULLET = '• '
+import { BULLET } from '../lib/note'
 
 interface NoteInputProps {
   value: string
