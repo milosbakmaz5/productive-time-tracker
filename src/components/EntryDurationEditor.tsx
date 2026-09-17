@@ -63,7 +63,7 @@ export function EntryDurationEditor({ entry }: EntryDurationEditorProps) {
         onBlur={handleBlur}
       />
       {mutation.isError && (
-        <p role="alert" className="mt-1 text-xs text-red-600">
+        <p role="alert" className="mt-1 text-xs text-error">
           Couldn't save: {mutation.error instanceof Error ? mutation.error.message : 'Something went wrong.'}
         </p>
       )}

@@ -22,15 +22,15 @@ export function Modal({ title, onClose, children }: ModalProps) {
         aria-modal="true"
         aria-label={title}
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+        className="w-full max-w-md rounded-xl bg-surface p-6 shadow-xl"
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
+          <h2 className="text-base font-semibold text-foreground">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-neutral-400 hover:text-neutral-700"
+            className="text-faint-foreground hover:text-foreground"
           >
             ✕
           </button>

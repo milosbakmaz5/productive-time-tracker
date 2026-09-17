@@ -28,17 +28,17 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-neutral-50 px-4">
+    <div className="flex min-h-svh items-center justify-center bg-background px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-xl border border-neutral-200 bg-white p-6 shadow-sm"
+        className="w-full max-w-sm rounded-xl border border-border bg-surface p-6 shadow-sm"
       >
-        <h1 className="text-lg font-semibold text-neutral-900">Sign in to Productive</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-lg font-semibold text-foreground">Sign in to Productive</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Enter your API token and organization ID from Settings → API integrations.
         </p>
 
-        <label className="mt-6 block text-sm font-medium text-neutral-700">
+        <label className="mt-6 block text-sm font-medium text-foreground">
           API token
           <input
             type="password"
@@ -46,11 +46,11 @@ export function LoginPage() {
             autoComplete="off"
             value={apiToken}
             onChange={(event) => setApiToken(event.target.value)}
-            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+            className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-primary"
           />
         </label>
 
-        <label className="mt-4 block text-sm font-medium text-neutral-700">
+        <label className="mt-4 block text-sm font-medium text-foreground">
           Organization ID
           <input
             type="text"
@@ -58,12 +58,12 @@ export function LoginPage() {
             autoComplete="off"
             value={organizationId}
             onChange={(event) => setOrganizationId(event.target.value)}
-            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+            className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-primary"
           />
         </label>
 
         {mutation.isError && (
-          <p role="alert" className="mt-4 text-sm text-red-600">
+          <p role="alert" className="mt-4 text-sm text-error">
             {mutation.error instanceof Error
               ? mutation.error.message
               : 'Could not sign in. Check your token and organization ID.'}
@@ -73,7 +73,7 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={mutation.isPending}
-          className="mt-6 w-full rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:opacity-50"
+          className="mt-6 w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover disabled:opacity-50"
         >
           {mutation.isPending ? 'Signing in…' : 'Sign in'}
         </button>

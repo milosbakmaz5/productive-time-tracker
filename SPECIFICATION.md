@@ -14,6 +14,14 @@ Productive Time Tracker is a client-side-only web app (no backend) for managing 
 - **Styling**: Tailwind CSS.
 - **No global client-state library** (Redux etc.) — the app's state is either server state (via TanStack Query) or local UI state, which doesn't justify the overhead at this scope.
 
+### Design tokens
+
+Colors are defined as semantic CSS custom properties in `src/index.css` (`--background`, `--foreground`, `--primary`, `--secondary`, `--accent`, `--error`), mapped into Tailwind v4's `@theme` so components use `bg-primary`/`text-foreground`/etc. instead of raw palette utilities (`bg-neutral-900`, `text-red-600`) scattered across files — changing the brand color or error shade is now a one-line edit in `index.css` rather than a find-and-replace.
+
+Only six colors are hand-picked (generated via [realtimecolors.com](https://www.realtimecolors.com) — one hue per role, saturation held constant at ~44%, lightness varies per role and per mode). Everything else - `surface`, `surface-hover`, `border`, `border-strong`, `muted-foreground`, `faint-foreground`, and the `primary`/`error` hover and surface variants - is derived from those six via CSS `color-mix()` rather than picked by hand, so the derived set can't drift out of sync with the base palette. `secondary`/`accent` are defined but not yet consumed by any component - reserved for future UI (e.g. a badge or highlight) rather than force-fit somewhere for the sake of using them.
+
+Dark mode is wired via `@media (prefers-color-scheme: dark)` re-defining the same six custom properties, so it follows the OS-level setting by default. A toggle in the `EntriesPage` header (`ThemeToggle`, next to Log out) lets the user override this explicitly: `useTheme` (`src/lib/theme.ts`) persists the choice to `localStorage` and sets `data-theme="dark"|"light"` on `<html>`, which `index.css` gives priority over the media query (`:root[data-theme="dark"]` for an explicit dark choice; `:root:not([data-theme="light"])` inside the media query, so an explicit light choice opts out even when the OS is dark). Once a user makes an explicit choice, the app stops following further OS-level changes - overriding was the point. A small inline script in `index.html` applies any stored override before React mounts, so there's no flash of the wrong theme on load.
+
 ## 3. Authentication
 
 - Login screen collects a Productive **API token** and **organization ID**.

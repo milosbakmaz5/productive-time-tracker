@@ -31,12 +31,12 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-label={title}
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl"
+        className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-xl"
       >
-        <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
-        <p className="mt-2 text-sm text-neutral-600">{message}</p>
+        <h2 className="text-base font-semibold text-foreground">{title}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{message}</p>
         {error && (
-          <p role="alert" className="mt-2 text-sm text-red-600">
+          <p role="alert" className="mt-2 text-sm text-error">
             {error}
           </p>
         )}
@@ -45,7 +45,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onCancel}
             disabled={isConfirming}
-            className="rounded-md px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 disabled:opacity-50"
+            className="rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover disabled:opacity-50"
           >
             {cancelLabel}
           </button>
@@ -53,7 +53,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={isConfirming}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            className="rounded-md bg-error px-4 py-2 text-sm font-medium text-white hover:bg-error-hover disabled:opacity-50"
           >
             {confirmLabel}
           </button>

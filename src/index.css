@@ -1,1 +1,70 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-faint-foreground: var(--faint-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-error: var(--error);
+  --color-error-hover: var(--error-hover);
+  --color-error-surface: var(--error-surface);
+  --color-error-border: var(--error-border);
+}
+
+/* Base palette generated on realtimecolors.com: one hue per role, saturation held constant
+ * (~44%) across all of them, only lightness varies. Everything below this block (surface,
+ * border, muted text, error state) is derived from these six via color-mix() rather than
+ * hand-picked, so the whole system stays in sync if the base palette ever changes. */
+:root {
+  --background: #f6f5fb;
+  --foreground: #0e0a1b;
+  --primary: #6451bc;
+  --secondary: #d89bd2;
+  --accent: #c86f9b;
+  --error: #a55140;
+
+  /* Elevated surface (cards/modals): lighten toward white. In dark mode this lightens the
+   * near-black background instead, which is the conventional "elevation" direction there too. */
+  --surface: color-mix(in srgb, white 8%, var(--background));
+  /* Hover/pressed feedback: the opposite direction - nudge toward the foreground color. */
+  --surface-hover: color-mix(in srgb, var(--foreground) 8%, var(--background));
+  --border: color-mix(in srgb, var(--foreground) 15%, transparent);
+  --border-strong: color-mix(in srgb, var(--foreground) 35%, transparent);
+  --muted-foreground: color-mix(in srgb, var(--foreground) 68%, var(--background) 32%);
+  --faint-foreground: color-mix(in srgb, var(--foreground) 35%, var(--background) 65%);
+  --primary-hover: color-mix(in srgb, var(--primary) 85%, black);
+  --error-hover: color-mix(in srgb, var(--error) 85%, black);
+  --error-surface: color-mix(in srgb, var(--error) 10%, var(--background));
+  --error-border: color-mix(in srgb, var(--error) 35%, var(--background));
+}
+
+/* Dark mode: follows the OS setting by default. `data-theme` on <html> (set by ThemeToggle,
+ * see src/lib/theme.ts) overrides it - "light" opts out of this block even when the OS is dark,
+ * and the explicit `[data-theme="dark"]` rule below opts in even when the OS is light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --background: #05040b;
+    --foreground: #e9e5f5;
+    --primary: #5643ad;
+    --secondary: #63275d;
+    --accent: #903763;
+    --error: #cd8c7f;
+  }
+}
+
+:root[data-theme='dark'] {
+  --background: #05040b;
+  --foreground: #e9e5f5;
+  --primary: #5643ad;
+  --secondary: #63275d;
+  --accent: #903763;
+  --error: #cd8c7f;
+}

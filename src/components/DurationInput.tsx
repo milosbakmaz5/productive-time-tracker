@@ -57,11 +57,11 @@ export function DurationInput({
           onBlur={handleBlur}
           title={isOverMax ? parsed.message : undefined}
           className={`w-14 rounded border bg-transparent px-1 text-sm font-semibold outline-none ${
-            isOverMax ? 'border-red-500 text-red-600' : 'border-transparent text-neutral-900'
+            isOverMax ? 'border-error text-error' : 'border-transparent text-foreground'
           }`}
         />
         {!readOnly && !isOverMax && (
-          <p className="mt-0.5 text-xs text-neutral-400">
+          <p className="mt-0.5 text-xs text-faint-foreground">
             {parsed.kind === 'valid' ? formatAsHHMM(parsed.minutes) : '--:--'}
           </p>
         )}
@@ -81,11 +81,11 @@ export function DurationInput({
         onBlur={handleBlur}
         title={isOverMax ? parsed.message : undefined}
         className={`w-20 rounded-md border px-3 py-2 text-sm outline-none ${
-          isOverMax ? 'border-red-500 focus:border-red-500' : 'border-neutral-300 focus:border-neutral-500'
+          isOverMax ? 'border-error focus:border-error' : 'border-border focus:border-primary'
         }`}
       />
       {!isOverMax && (
-        <span className="text-sm text-neutral-400">= {parsed.kind === 'valid' ? parsed.display : '--:--'}</span>
+        <span className="text-sm text-faint-foreground">= {parsed.kind === 'valid' ? parsed.display : '--:--'}</span>
       )}
     </div>
   )

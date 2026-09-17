@@ -21,25 +21,25 @@ export function EntryFormFields({
 }: EntryFormFieldsProps) {
   return (
     <>
-      <label className="block text-sm font-medium text-neutral-700">
+      <label className="block text-sm font-medium text-foreground">
         Duration
         <div className="mt-1">
           <DurationInput value={durationText} onChange={onDurationChange} />
         </div>
       </label>
 
-      <label className="block text-sm font-medium text-neutral-700">
+      <label className="block text-sm font-medium text-foreground">
         Date
         <input
           type="date"
           required
           value={date}
           onChange={(event) => onDateChange(event.target.value)}
-          className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-primary"
         />
       </label>
 
-      <label className="block text-sm font-medium text-neutral-700">
+      <label className="block text-sm font-medium text-foreground">
         Description
         <div className="mt-1">
           <NoteInput value={note} onChange={onNoteChange} />

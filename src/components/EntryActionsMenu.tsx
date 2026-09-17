@@ -39,7 +39,7 @@ export function EntryActionsMenu({ entryId, onDelete }: EntryActionsMenuProps) {
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label="Entry actions"
-        className="rounded-md p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+        className="rounded-md p-1 text-faint-foreground hover:bg-surface-hover hover:text-foreground"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <circle cx="8" cy="2.5" r="1.4" />
@@ -51,14 +51,14 @@ export function EntryActionsMenu({ entryId, onDelete }: EntryActionsMenuProps) {
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 z-10 mt-1 w-32 overflow-hidden rounded-md border border-neutral-200 bg-white py-1 shadow-lg"
+          className="absolute right-0 z-10 mt-1 w-32 overflow-hidden rounded-md border border-border bg-surface py-1 shadow-lg"
         >
           <Link
             to={`/entries/${entryId}/edit`}
             state={{ backgroundLocation: location }}
             role="menuitem"
             onClick={() => setIsOpen(false)}
-            className="block px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50"
+            className="block px-3 py-1.5 text-sm text-foreground hover:bg-surface-hover"
           >
             Edit
           </Link>
@@ -69,7 +69,7 @@ export function EntryActionsMenu({ entryId, onDelete }: EntryActionsMenuProps) {
               setIsOpen(false)
               onDelete()
             }}
-            className="block w-full px-3 py-1.5 text-left text-sm text-red-600 hover:bg-red-50"
+            className="block w-full px-3 py-1.5 text-left text-sm text-error hover:bg-error-surface"
           >
             Delete
           </button>
