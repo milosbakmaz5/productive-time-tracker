@@ -1,8 +1,10 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { AddEntryModal } from '../components/AddEntryModal'
-import { listTimeEntries } from '../lib/api/timeEntries'
+import { ConfirmDialog } from '../components/ConfirmDialog'
+import { EntryActionsMenu } from '../components/EntryActionsMenu'
+import { deleteTimeEntry, listTimeEntries } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { formatDuration, today } from '../lib/format'
 
@@ -10,10 +12,10 @@ export function EntriesPage() {
   const { credentials, logout } = useAuth()
   const personId = credentials!.personId
   const queryClient = useQueryClient()
-  const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const date = searchParams.get('date') ?? today()
   const [isAddOpen, setIsAddOpen] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   function setDate(next: string) {
     setSearchParams((prev) => {
@@ -42,6 +44,19 @@ export function EntriesPage() {
     // reusing the same error+retry UI as any other failure.
     networkMode: 'always',
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteTimeEntry(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['time-entries', personId, date] })
+      setDeletingId(null)
+    },
+  })
+
+  function requestDelete(id: string) {
+    deleteMutation.reset()
+    setDeletingId(id)
+  }
 
   return (
     <div className="min-h-svh bg-neutral-50">
@@ -101,20 +116,14 @@ export function EntriesPage() {
             <ul className="space-y-2">
               {entries.map((entry) => (
                 <li key={entry.id} className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
-                  <div className="flex items-baseline justify-between">
+                  <div className="flex items-baseline justify-between gap-2">
                     <span className="text-sm font-semibold text-neutral-900">{formatDuration(entry.time)}</span>
-                    <span className="text-xs text-neutral-400">{entry.date}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-neutral-400">{entry.date}</span>
+                      <EntryActionsMenu entryId={entry.id} onDelete={() => requestDelete(entry.id)} />
+                    </div>
                   </div>
                   {entry.note && <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600">{entry.note}</p>}
-                  <div className="mt-2 flex justify-end">
-                    <Link
-                      to={`/entries/${entry.id}/edit`}
-                      state={{ backgroundLocation: location }}
-                      className="text-xs font-medium text-neutral-500 hover:text-neutral-900"
-                    >
-                      Edit
-                    </Link>
-                  </div>
                 </li>
               ))}
             </ul>
@@ -132,6 +141,25 @@ export function EntriesPage() {
             queryClient.invalidateQueries({ queryKey: ['time-entries', personId, created.date] })
             setIsAddOpen(false)
           }}
+        />
+      )}
+
+      {deletingId && (
+        <ConfirmDialog
+          title="Delete time entry?"
+          message="This can't be undone."
+          confirmLabel={deleteMutation.isPending ? 'Deleting…' : 'Delete'}
+          cancelLabel="Cancel"
+          isConfirming={deleteMutation.isPending}
+          error={
+            deleteMutation.isError
+              ? deleteMutation.error instanceof Error
+                ? deleteMutation.error.message
+                : 'Something went wrong.'
+              : null
+          }
+          onConfirm={() => deleteMutation.mutate(deletingId)}
+          onCancel={() => setDeletingId(null)}
         />
       )}
     </div>
