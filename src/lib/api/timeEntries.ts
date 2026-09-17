@@ -1,5 +1,5 @@
 import { apiFetch } from './client'
-import { stripHtml } from '../html'
+import { noteToHtml, stripHtml } from '../html'
 import type { JsonApiCollectionDocument, JsonApiDocument } from './types'
 
 interface TimeEntryAttributes {
@@ -60,7 +60,7 @@ export async function createTimeEntry(input: CreateTimeEntryInput): Promise<Time
         attributes: {
           date: input.date,
           time: input.time,
-          note: input.note,
+          note: noteToHtml(input.note),
         },
         relationships: {
           person: { data: { type: 'people', id: input.personId } },
@@ -89,7 +89,7 @@ export async function updateTimeEntry(id: string, input: UpdateTimeEntryInput): 
         attributes: {
           date: input.date,
           time: input.time,
-          note: input.note,
+          note: noteToHtml(input.note),
         },
       },
     },
