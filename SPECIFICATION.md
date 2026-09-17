@@ -146,6 +146,16 @@ The description is editable directly in the list - click it, edit, and it saves 
 - On blur: if the (bullet-normalized) draft matches the (bullet-normalized) original, nothing is sent - no pointless request for an unchanged field. On failure, the field is deliberately **not** reset to read-only - the draft (and its edits) stay visible and editable so the user can see what failed and retry, instead of the edit silently reappearing lost the next time the entry refetches.
 - Saving submits the entry's existing `date`/`time` unchanged alongside the new `note`, since `PATCH` always sends the full attribute set (see §4) - there's no partial-field update on the API.
 
+### Entry card: inline duration editing
+
+Duration is editable in place the same way, via `EntryDurationEditor` (`src/components/EntryDurationEditor.tsx`) - architecturally identical to `EntryNoteEditor` (always-mounted input toggling `readOnly`, render-time sync from the server value while not editing, save-on-blur-only-if-changed, stay-editable-on-failure). It reuses `DurationInput` itself rather than a separate input, so the parsing rules (free-form number or `HH:MM`, `<10` → hours, `>=10` whole → minutes, 24h cap) are identical to the create/edit forms.
+
+`DurationInput` gained the same `variant`/`readOnly`/`onFocus`/`onBlur` props as `NoteInput`. The `'plain'` variant is narrower (`w-14`/`w-20` vs the boxed forms' wider fields) and shows a live `HH:MM` preview below the input while editing (e.g. typing `1111` shows `18:31` underneath), instead of the boxed variant's side `= Xh Ym` helper.
+
+Invalid/over-24h input does not show inline text - it adds a red border to the input itself and a native `title` tooltip ("Must be less than 24 hours") shown on hover, keeping the compact list row from growing to fit an error line. One real bug surfaced building this: the boxed variant's `focus:border-neutral-500` utility has higher CSS specificity than a plain `border-red-500` class, so the red border was invisible while the field was actually focused (only appearing after blur) until the focus variant was made conditional too (`focus:border-red-500` when over max).
+
+Selecting the full value on focus (`.select()`) is deferred one frame via `requestAnimationFrame` - calling it synchronously raced the browser's own selection reset that happens when the `readOnly` attribute flips off a moment later (as a result of the same focus event), so the selection was silently cleared before the user saw it.
+
 ### API error messages
 
 `ApiError.fromResponse` (`src/lib/api/errors.ts`) parses Productive's JSON:API error body instead of always falling back to a generic `Productive API error (422)` string: it uses `errors[0].detail`/`.title` (prefixed with the offending field, read from `source.pointer`) when present, with a small override map for specific error codes whose raw `detail` reads too tersely out of context. Currently one entry: `time_entry_salary_not_defined` (Productive rejects time entries dated before a person's salary/cost-rate record starts) becomes "This date is before your cost rate was set up in Productive, so time can't be tracked for it." instead of just the field name and "has no salary defined."

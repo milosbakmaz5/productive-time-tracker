@@ -4,10 +4,10 @@ import { useSearchParams } from 'react-router-dom'
 import { AddEntryModal } from '../components/AddEntryModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EntryActionsMenu } from '../components/EntryActionsMenu'
+import { EntryDurationEditor } from '../components/EntryDurationEditor'
 import { EntryNoteEditor } from '../components/EntryNoteEditor'
 import { deleteTimeEntry, listTimeEntries } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
-import { formatAsHHMM } from '../lib/duration'
 import { today } from '../lib/format'
 
 export function EntriesPage() {
@@ -120,8 +120,8 @@ export function EntriesPage() {
                 <li key={entry.id} className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
                   <div className="flex items-start justify-between gap-3">
                     <EntryNoteEditor entry={entry} />
-                    <div className="flex shrink-0 items-center gap-2">
-                      <span className="text-sm font-semibold text-neutral-900">{formatAsHHMM(entry.time)}</span>
+                    <div className="flex shrink-0 items-start gap-2">
+                      <EntryDurationEditor entry={entry} />
                       <EntryActionsMenu entryId={entry.id} onDelete={() => requestDelete(entry.id)} />
                     </div>
                   </div>

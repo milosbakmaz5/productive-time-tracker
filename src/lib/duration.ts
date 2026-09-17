@@ -38,7 +38,7 @@ export function parseDurationInput(raw: string): ParsedDuration {
 
 function toResult(totalMinutes: number): ParsedDuration {
   if (totalMinutes > MAX_MINUTES) {
-    return { kind: 'exceeds-max', message: 'Max duration is 24h.' }
+    return { kind: 'exceeds-max', message: 'Must be less than 24 hours' }
   }
   return { kind: 'valid', minutes: totalMinutes, display: formatMinutes(totalMinutes) }
 }
