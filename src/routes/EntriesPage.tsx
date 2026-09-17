@@ -4,9 +4,11 @@ import { useSearchParams } from 'react-router-dom'
 import { AddEntryModal } from '../components/AddEntryModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EntryActionsMenu } from '../components/EntryActionsMenu'
+import { EntryNoteEditor } from '../components/EntryNoteEditor'
 import { deleteTimeEntry, listTimeEntries } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
-import { formatDuration, today } from '../lib/format'
+import { formatAsHHMM } from '../lib/duration'
+import { today } from '../lib/format'
 
 export function EntriesPage() {
   const { credentials, logout } = useAuth()
@@ -116,14 +118,13 @@ export function EntriesPage() {
             <ul className="space-y-2">
               {entries.map((entry) => (
                 <li key={entry.id} className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-sm font-semibold text-neutral-900">{formatDuration(entry.time)}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-neutral-400">{entry.date}</span>
+                  <div className="flex items-start justify-between gap-3">
+                    <EntryNoteEditor entry={entry} />
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-sm font-semibold text-neutral-900">{formatAsHHMM(entry.time)}</span>
                       <EntryActionsMenu entryId={entry.id} onDelete={() => requestDelete(entry.id)} />
                     </div>
                   </div>
-                  {entry.note && <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600">{entry.note}</p>}
                 </li>
               ))}
             </ul>
