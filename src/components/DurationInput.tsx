@@ -23,6 +23,9 @@ export function DurationInput({
 }: DurationInputProps) {
   const parsed = parseDurationInput(value)
   const isOverMax = parsed.kind === 'exceeds-max'
+  // The 'plain' variant's live HH:MM preview only makes sense while actively editing, and gets
+  // replaced by the error tooltip once over the 24h cap.
+  const shouldShowPreview = !readOnly && !isOverMax
 
   function handleBlur() {
     if (parsed.kind === 'valid') {
@@ -60,7 +63,7 @@ export function DurationInput({
             isOverMax ? 'border-error text-error' : 'border-transparent text-foreground'
           }`}
         />
-        {!readOnly && !isOverMax && (
+        {shouldShowPreview && (
           <p className="mt-0.5 text-xs text-faint-foreground">
             {parsed.kind === 'valid' ? formatAsHHMM(parsed.minutes) : '--:--'}
           </p>

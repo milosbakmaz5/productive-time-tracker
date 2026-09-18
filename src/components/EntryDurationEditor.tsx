@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { getErrorMessage } from '../lib/api/errors'
 import { timeEntriesWeekQueryKey, updateTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { formatAsHHMM, parseDurationInput } from '../lib/duration'
@@ -71,7 +72,7 @@ export function EntryDurationEditor({ entry, onSavingChange }: EntryDurationEdit
       />
       {mutation.isError && (
         <p role="alert" className="mt-1 text-xs text-error">
-          Couldn't save: {mutation.error instanceof Error ? mutation.error.message : 'Something went wrong.'}
+          Couldn't save: {getErrorMessage(mutation.error)}
         </p>
       )}
     </div>

@@ -7,6 +7,7 @@ import { EntryRow } from '../components/EntryRow'
 import { SettingsMenu } from '../components/SettingsMenu'
 import { WeekDayStrip } from '../components/WeekDayStrip'
 import { WeekNav } from '../components/WeekNav'
+import { getErrorMessage } from '../lib/api/errors'
 import { deleteTimeEntry, listTimeEntriesForRange, timeEntriesWeekQueryKey } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { today } from '../lib/format'
@@ -51,7 +52,13 @@ export function EntriesPage() {
     networkMode: 'always',
   })
 
-  const entries = useMemo(() => weekEntries?.filter((entry) => entry.date === date), [weekEntries, date])
+  // Defaults to [] (rather than leaving it undefined while weekEntries hasn't loaded) so the
+  // render logic below never has to juggle an "entries is present but might be undefined" case -
+  // isPending/isError already gate whether this array's content means anything.
+  const entries = useMemo(() => weekEntries?.filter((entry) => entry.date === date) ?? [], [weekEntries, date])
+  const hasLoaded = !isPending && !isError
+  const shouldShowEmptyState = hasLoaded && entries.length === 0
+  const shouldShowEntries = hasLoaded && entries.length > 0
 
   const dailyTotals = useMemo(() => {
     const totals: Record<string, number> = {}
@@ -110,16 +117,11 @@ export function EntriesPage() {
       <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
         {isPending && <EntriesLoading />}
 
-        {isError && (
-          <EntriesError
-            message={error instanceof Error ? error.message : 'Something went wrong.'}
-            onRetry={() => refetch()}
-          />
-        )}
+        {isError && <EntriesError message={getErrorMessage(error)} onRetry={() => refetch()} />}
 
-        {!isPending && !isError && entries && entries.length === 0 && <EntriesEmpty />}
+        {shouldShowEmptyState && <EntriesEmpty />}
 
-        {!isPending && !isError && entries && entries.length > 0 && (
+        {shouldShowEntries && (
           <ul className="space-y-2">
             {entries.map((entry) => (
               <EntryRow key={entry.id} entry={entry} onDelete={() => requestDelete(entry.id)} />
@@ -148,13 +150,7 @@ export function EntriesPage() {
           confirmLabel={deleteMutation.isPending ? 'Deleting…' : 'Delete'}
           cancelLabel="Cancel"
           isConfirming={deleteMutation.isPending}
-          error={
-            deleteMutation.isError
-              ? deleteMutation.error instanceof Error
-                ? deleteMutation.error.message
-                : 'Something went wrong.'
-              : null
-          }
+          error={deleteMutation.isError ? getErrorMessage(deleteMutation.error) : null}
           onConfirm={() => deleteMutation.mutate(deletingId)}
           onCancel={() => setDeletingId(null)}
         />

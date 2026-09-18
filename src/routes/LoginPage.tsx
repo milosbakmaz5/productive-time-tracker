@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth/useAuth'
+import { getErrorMessage } from '../lib/api/errors'
 import { resolvePersonId } from '../lib/api/organizationMemberships'
 
 export function LoginPage() {
@@ -64,9 +65,7 @@ export function LoginPage() {
 
         {mutation.isError && (
           <p role="alert" className="mt-4 text-sm text-error">
-            {mutation.error instanceof Error
-              ? mutation.error.message
-              : 'Could not sign in. Check your token and organization ID.'}
+            {getErrorMessage(mutation.error, 'Could not sign in. Check your token and organization ID.')}
           </p>
         )}
 

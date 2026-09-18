@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EntryFormFields } from '../components/EntryFormFields'
 import { Modal } from '../components/Modal'
+import { getErrorMessage } from '../lib/api/errors'
 import { getTimeEntry, timeEntriesWeekQueryKey, updateTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { formatAsHHMM, parseDurationInput } from '../lib/duration'
@@ -41,7 +42,7 @@ export function EditEntryPage() {
         <div role="alert" className="rounded-lg border border-error-border bg-error-surface p-6 text-center">
           <p className="text-sm text-error">
             Couldn't load this entry:{' '}
-            {entryQuery.error instanceof Error ? entryQuery.error.message : 'Something went wrong.'}
+            {getErrorMessage(entryQuery.error)}
           </p>
           <div className="mt-3 flex justify-center gap-2">
             <button
@@ -133,7 +134,7 @@ function EditEntryForm({ entry, onBack }: { entry: TimeEntry; onBack: () => void
 
           {mutation.isError && (
             <p role="alert" className="text-sm text-error">
-              {mutation.error instanceof Error ? mutation.error.message : 'Something went wrong.'}
+              {getErrorMessage(mutation.error)}
             </p>
           )}
 

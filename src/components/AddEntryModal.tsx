@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
+import { getErrorMessage } from '../lib/api/errors'
 import { createTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { resolveServiceId } from '../lib/api/services'
 import { parseDurationInput } from '../lib/duration'
@@ -69,7 +70,7 @@ export function AddEntryModal({ personId, defaultDate, onClose, onCreated }: Add
 
           {mutation.isError && (
             <p role="alert" className="text-sm text-error">
-              {mutation.error instanceof Error ? mutation.error.message : 'Something went wrong.'}
+              {getErrorMessage(mutation.error)}
             </p>
           )}
 

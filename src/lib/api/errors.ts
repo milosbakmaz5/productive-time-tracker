@@ -52,3 +52,9 @@ export class ApiError extends Error {
     return new ApiError(`Productive API error (${status})`, status, body)
   }
 }
+
+/** `useQuery`/`useMutation` type their `error` as `unknown` - this is the one-liner every
+ * error-displaying component needs, so it's written once instead of repeated at each call site. */
+export function getErrorMessage(error: unknown, fallback = 'Something went wrong.'): string {
+  return error instanceof Error ? error.message : fallback
+}
