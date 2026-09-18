@@ -6,6 +6,7 @@ import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EntryRow } from '../components/EntryRow'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { WeekDayStrip } from '../components/WeekDayStrip'
+import { WeekNav } from '../components/WeekNav'
 import { deleteTimeEntry, listTimeEntriesForRange, timeEntriesWeekQueryKey } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { today } from '../lib/format'
@@ -75,9 +76,10 @@ export function EntriesPage() {
 
   return (
     <div className="min-h-svh bg-background">
-      <header className="border-b border-border bg-surface px-4 py-4 sm:px-6">
+      <header className="sticky top-0 z-20 border-b border-border bg-surface px-4 py-4 sm:px-6">
+        <h1 className="sr-only">Time entries</h1>
         <div className="mx-auto flex max-w-2xl items-center justify-between">
-          <h1 className="text-base font-semibold text-foreground">Time entries</h1>
+          <WeekNav weekStart={weekStart} selectedDate={date} onSelectDate={setDate} />
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <button
