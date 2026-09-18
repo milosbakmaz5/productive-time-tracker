@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AddEntryModal } from '../components/AddEntryModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
@@ -7,9 +7,11 @@ import { EntryActionsMenu } from '../components/EntryActionsMenu'
 import { EntryDurationEditor } from '../components/EntryDurationEditor'
 import { EntryNoteEditor } from '../components/EntryNoteEditor'
 import { ThemeToggle } from '../components/ThemeToggle'
-import { deleteTimeEntry, listTimeEntries } from '../lib/api/timeEntries'
+import { WeekDayStrip } from '../components/WeekDayStrip'
+import { deleteTimeEntry, listTimeEntriesForRange, timeEntriesWeekQueryKey } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { today } from '../lib/format'
+import { addDays, startOfWeek } from '../lib/week'
 
 export function EntriesPage() {
   const { credentials, logout } = useAuth()
@@ -28,16 +30,19 @@ export function EntriesPage() {
     })
   }
 
+  const weekStart = useMemo(() => startOfWeek(date), [date])
+  const weekEnd = useMemo(() => addDays(weekStart, 6), [weekStart])
+
   const {
-    data: entries,
+    data: weekEntries,
     isPending,
     isError,
     error,
     isFetching,
     refetch,
   } = useQuery({
-    queryKey: ['time-entries', personId, date],
-    queryFn: () => listTimeEntries(personId, date),
+    queryKey: [...timeEntriesWeekQueryKey(personId), weekStart],
+    queryFn: () => listTimeEntriesForRange(personId, weekStart, weekEnd),
     // We already surface an explicit Retry button - default silent retries would just delay
     // showing a real failure by several seconds behind a loading indicator.
     retry: false,
@@ -48,10 +53,20 @@ export function EntriesPage() {
     networkMode: 'always',
   })
 
+  const entries = useMemo(() => weekEntries?.filter((entry) => entry.date === date), [weekEntries, date])
+
+  const dailyTotals = useMemo(() => {
+    const totals: Record<string, number> = {}
+    for (const entry of weekEntries ?? []) {
+      totals[entry.date] = (totals[entry.date] ?? 0) + entry.time
+    }
+    return totals
+  }, [weekEntries])
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteTimeEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['time-entries', personId, date] })
+      queryClient.invalidateQueries({ queryKey: timeEntriesWeekQueryKey(personId) })
       setDeletingId(null)
     },
   })
@@ -107,6 +122,16 @@ export function EntriesPage() {
         </div>
 
         <div className="mt-4">
+          <WeekDayStrip
+            weekStart={weekStart}
+            selectedDate={date}
+            dailyTotals={dailyTotals}
+            onSelectDate={setDate}
+            isLoading={isPending}
+          />
+        </div>
+
+        <div className="mt-4">
           {isPending && <EntriesLoading />}
 
           {isError && (
@@ -143,7 +168,7 @@ export function EntriesPage() {
           onClose={() => setIsAddOpen(false)}
           onCreated={(created) => {
             setDate(created.date)
-            queryClient.invalidateQueries({ queryKey: ['time-entries', personId, created.date] })
+            queryClient.invalidateQueries({ queryKey: timeEntriesWeekQueryKey(personId) })
             setIsAddOpen(false)
           }}
         />

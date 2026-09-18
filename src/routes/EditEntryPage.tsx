@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EntryFormFields } from '../components/EntryFormFields'
 import { Modal } from '../components/Modal'
-import { getTimeEntry, updateTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
+import { getTimeEntry, timeEntriesWeekQueryKey, updateTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { formatAsHHMM, parseDurationInput } from '../lib/duration'
 import { EMPTY_NOTE, normalizeNoteForSubmit } from '../lib/note'
@@ -102,14 +102,13 @@ function EditEntryForm({ entry, onBack }: { entry: TimeEntry; onBack: () => void
         note: normalizeNoteForSubmit(note),
       })
     },
-    onSuccess: (updated) => {
-      // Refresh both the entry's original date (so it disappears from there if it moved) and
-      // its new one, but return to wherever the user was reviewing rather than jumping the list
-      // to follow the edited entry - they're oriented around a day, not around this one entry.
-      queryClient.invalidateQueries({ queryKey: ['time-entries', personId, entry.date] })
-      if (updated.date !== entry.date) {
-        queryClient.invalidateQueries({ queryKey: ['time-entries', personId, updated.date] })
-      }
+    onSuccess: () => {
+      // Prefix-invalidates every cached week for this person - covers the entry's old and new
+      // date (and old/new week, if the edit moved it across a week boundary) without having to
+      // work out which weeks are actually affected. Returns to wherever the user was reviewing
+      // rather than jumping the list to follow the edited entry - they're oriented around a day,
+      // not around this one entry.
+      queryClient.invalidateQueries({ queryKey: timeEntriesWeekQueryKey(personId) })
       onBack()
     },
   })

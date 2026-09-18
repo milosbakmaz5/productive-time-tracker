@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { updateTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
+import { timeEntriesWeekQueryKey, updateTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { formatAsHHMM, parseDurationInput } from '../lib/duration'
 import { DurationInput } from './DurationInput'
@@ -32,7 +32,7 @@ export function EntryDurationEditor({ entry }: EntryDurationEditorProps) {
   const mutation = useMutation({
     mutationFn: (minutes: number) => updateTimeEntry(entry.id, { date: entry.date, time: minutes, note: entry.note }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['time-entries', personId, entry.date] })
+      queryClient.invalidateQueries({ queryKey: timeEntriesWeekQueryKey(personId) })
     },
   })
 

@@ -30,11 +30,21 @@ export async function getTimeEntry(id: string): Promise<TimeEntry> {
   return toTimeEntry(doc.data)
 }
 
-export async function listTimeEntries(personId: string, date: string): Promise<TimeEntry[]> {
+/** Prefix-matches every cached week query for this person regardless of which week, so callers
+ * that change one entry don't need to work out exactly which week(s) it falls into (including
+ * the edge case of an edit moving an entry across a week boundary). */
+export function timeEntriesWeekQueryKey(personId: string) {
+  return ['time-entries-week', personId] as const
+}
+
+/** Fetches every entry in a date range (inclusive) in one call, so a week view can show
+ * per-day totals without a separate request per day. */
+export async function listTimeEntriesForRange(personId: string, from: string, to: string): Promise<TimeEntry[]> {
   const doc = await apiFetch<JsonApiCollectionDocument<TimeEntryAttributes>>('/time_entries', {
     query: {
       'filter[person_id]': personId,
-      'filter[date]': date,
+      'filter[date][gt_eq]': from,
+      'filter[date][lt_eq]': to,
       per_page: '200',
     },
   })
