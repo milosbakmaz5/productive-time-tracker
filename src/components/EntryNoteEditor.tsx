@@ -13,29 +13,21 @@ interface EntryNoteEditorProps {
   onSavingChange?: (isSaving: boolean) => void
 }
 
-/**
- * Click the description in the list to edit it in place - the underlying textarea is always
- * rendered (just toggling its `readOnly` attribute) rather than swapping a <p> for a <textarea>
- * on click, so the browser's native click-to-position-cursor behavior lands correctly; swapping
- * elements on click would put the textarea in the DOM only after the click already happened,
- * losing the cursor position the click was meant to set.
- */
+// The textarea is always mounted, just toggling readOnly - swapping a <p> for it only on click
+// would lose the click's cursor position, since the textarea wouldn't exist yet to receive it.
 export function EntryNoteEditor({ entry, onSavingChange }: EntryNoteEditorProps) {
   const queryClient = useQueryClient()
   const { credentials } = useAuth()
   const personId = credentials!.personId
 
   const [isEditing, setIsEditing] = useState(false)
-  // Deliberately the raw value (not defaulted to EMPTY_NOTE) while not editing, so a genuinely
-  // empty note is actually empty - showing the placeholder - rather than displaying a lone bullet
-  // with nothing after it. The default-to-bullet behavior only kicks in once editing starts.
+  // Raw value while not editing (not defaulted to EMPTY_NOTE), so an empty note shows the
+  // placeholder instead of a stray bullet. Defaults to a bullet only once editing starts.
   const [draft, setDraft] = useState(entry.note)
   const [syncedNote, setSyncedNote] = useState(entry.note)
 
-  // Keep the draft in sync with the server value when it changes from outside (e.g. a refetch),
-  // but not while actively editing, which would clobber what's being typed. Adjusted during
-  // render - React's documented pattern for "reset state when a prop changes" - rather than in
-  // an effect, which would trigger an extra, unnecessary render pass.
+  // Synced from the prop during render, not an effect, so an external change (e.g. a refetch)
+  // doesn't clobber an in-progress edit.
   if (!isEditing && entry.note !== syncedNote) {
     setSyncedNote(entry.note)
     setDraft(entry.note)
@@ -68,9 +60,7 @@ export function EntryNoteEditor({ entry, onSavingChange }: EntryNoteEditorProps)
       return
     }
 
-    // Stay in editing mode on failure rather than snapping back to read-only - the user's edit
-    // is still visible in the draft and they can fix/retry, instead of it silently vanishing on
-    // the next refetch of the (still unsaved) server value.
+    // Stays editable on failure so the edit isn't lost - only exits edit mode once saved.
     mutation.mutate(normalizedDraft, { onSuccess: () => setIsEditing(false) })
   }
 

@@ -30,12 +30,9 @@ export const DurationInput = forwardRef<HTMLInputElement, DurationInputProps>(fu
     onBlur?.()
   }
 
-  // Focusing selects the whole value (visibly highlighted), so typing immediately replaces it
-  // rather than requiring a manual select-all first - this is a short value people are more
-  // likely to retype fresh than edit in place. Deferred to the next frame: when `readOnly` is
-  // driven by this same focus event (the inline list variant unlocks editing on focus), the
-  // browser resets any selection made while the input was still readOnly once the attribute
-  // actually flips off a moment later - selecting only after that settles avoids the reset.
+  // Selects the whole value on focus, so typing replaces it. Deferred a frame: doing it
+  // synchronously raced the 'plain' variant's readOnly-removal, and the browser cleared the
+  // selection once that attribute actually flipped off a moment later.
   function handleFocus(event: FocusEvent<HTMLInputElement>) {
     const el = event.currentTarget
     requestAnimationFrame(() => el.select())

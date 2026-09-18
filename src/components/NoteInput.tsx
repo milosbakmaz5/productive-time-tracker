@@ -23,12 +23,8 @@ function lineEndAt(text: string, pos: number): number {
   return idx === -1 ? text.length : idx
 }
 
-/**
- * Plain-textarea note field with lightweight bullet-list editing, matching common note-app
- * conventions: Enter continues the current bullet; Enter on an empty bullet removes it
- * (exits list mode) instead of adding another blank bullet; typing "- " at the start of a
- * line converts it back into a bullet.
- */
+/** Plain textarea with lightweight bullet-list editing: Enter continues a bullet, Enter on an
+ * empty one exits list mode, and typing "- " at a line start re-enters it. */
 export function NoteInput({
   value,
   onChange,
@@ -40,9 +36,7 @@ export function NoteInput({
 }: NoteInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // 'plain' is rendered inline among other content (no fixed box to scroll within), so it has to
-  // grow to fit its own content rather than clip it - recalculated whenever the value changes,
-  // including the very first render, so a note that arrives already multi-line isn't clipped.
+  // 'plain' has no fixed box to scroll within, so it grows to fit its content instead of clipping.
   useEffect(() => {
     if (variant !== 'plain') return
     const el = textareaRef.current

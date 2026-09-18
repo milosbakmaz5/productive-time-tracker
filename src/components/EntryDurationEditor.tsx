@@ -13,9 +13,8 @@ interface EntryDurationEditorProps {
   onSavingChange?: (isSaving: boolean) => void
 }
 
-/** Click the duration in the list to edit it in place, same parsing/blur-reformat/select-on-focus
- * logic as the create/edit forms' DurationInput - just the 'plain' variant, with the live HH:MM
- * preview below the input instead of beside it. Saves on blur, mirroring EntryNoteEditor. */
+/** Click the duration in the list to edit it in place - reuses DurationInput's 'plain' variant,
+ * same parsing rules as the create/edit forms. Saves on blur, mirroring EntryNoteEditor. */
 export function EntryDurationEditor({ entry, onSavingChange }: EntryDurationEditorProps) {
   const queryClient = useQueryClient()
   const { credentials } = useAuth()
@@ -25,9 +24,7 @@ export function EntryDurationEditor({ entry, onSavingChange }: EntryDurationEdit
   const [draft, setDraft] = useState(() => formatAsHHMM(entry.time))
   const [syncedTime, setSyncedTime] = useState(entry.time)
 
-  // Keep the draft in sync with the server value when it changes from outside (e.g. a refetch),
-  // but not while actively editing. Adjusted during render rather than in an effect, same
-  // reasoning as EntryNoteEditor.
+  // Synced from the prop during render, not an effect - see EntryNoteEditor for why.
   if (!isEditing && entry.time !== syncedTime) {
     setSyncedTime(entry.time)
     setDraft(formatAsHHMM(entry.time))
@@ -47,9 +44,7 @@ export function EntryDurationEditor({ entry, onSavingChange }: EntryDurationEdit
   function handleBlur() {
     const parsed = parseDurationInput(draft)
 
-    // Invalid or over-24h: don't save, and don't snap back to read-only either - stay editable
-    // (with the warning still visible below) so the user can see what's wrong and fix it, rather
-    // than silently discarding what they typed.
+    // Invalid or over-24h: don't save, and stay editable so the warning stays visible.
     if (parsed.kind !== 'valid') return
 
     if (parsed.minutes === entry.time) {

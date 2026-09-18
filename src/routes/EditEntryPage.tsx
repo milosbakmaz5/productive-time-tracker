@@ -26,12 +26,9 @@ export function EditEntryPage() {
     navigate(-1)
   }
 
-  // Renders nothing while pending rather than a loading-skeleton Modal: the query usually
-  // resolves fast enough that a skeleton Modal immediately swapped for the real one just
-  // flashed one overlay into another (and, with Modal's focus trap, yanked focus twice in a
-  // row). The error state below still gets its own Modal, since it isn't a fleeting frame - the
-  // user may sit on it and needs Retry/Back to be reachable. Neither needs the unsaved-changes
-  // guard the loaded form (below) has - there's nothing to lose yet.
+  // Nothing rendered while pending - a skeleton Modal here resolves fast enough that it just
+  // flashed into the real one (and yanked focus twice). The error state keeps its own Modal
+  // since it isn't fleeting - the user may sit on it and needs Retry/Back reachable.
   if (entryQuery.isPending) {
     return null
   }
@@ -105,11 +102,8 @@ function EditEntryForm({ entry, onBack }: { entry: TimeEntry; onBack: () => void
       })
     },
     onSuccess: () => {
-      // Prefix-invalidates every cached week for this person - covers the entry's old and new
-      // date (and old/new week, if the edit moved it across a week boundary) without having to
-      // work out which weeks are actually affected. Returns to wherever the user was reviewing
-      // rather than jumping the list to follow the edited entry - they're oriented around a day,
-      // not around this one entry.
+      // Invalidates every cached week for this person, covering old/new date and week in one go.
+      // Returns to wherever the user was, rather than jumping to follow the edited entry.
       queryClient.invalidateQueries({ queryKey: timeEntriesWeekQueryKey(personId) })
       onBack()
     },
