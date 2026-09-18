@@ -3,14 +3,9 @@ import { useEffect, type RefObject } from 'react'
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
-/**
- * Standard modal focus behavior, missing before this: moves focus into the dialog when it opens
- * (`initialFocusRef`'s element if given and present, otherwise the first focusable element, or
- * the container itself if it has none), keeps Tab/Shift+Tab cycling within it instead of
- * escaping to the page behind, and restores focus to whatever triggered the dialog once it
- * closes - the element itself, not just "somewhere sensible", since `document.activeElement` at
- * mount time *is* the trigger.
- */
+/** Standard modal focus behavior: moves focus into the dialog on open (`initialFocusRef` if
+ * given, else the first focusable element), traps Tab/Shift+Tab within it, and restores focus
+ * to the trigger on close. */
 export function useFocusTrap(
   containerRef: RefObject<HTMLElement | null>,
   initialFocusRef?: RefObject<HTMLElement | null>,
@@ -47,7 +42,6 @@ export function useFocusTrap(
       document.removeEventListener('keydown', handleKeyDown)
       previouslyFocused?.focus()
     }
-    // Both refs (the objects from useRef) never change identity across re-renders, so this
-    // still only runs once on mount/unmount despite listing them here.
+    // Both are stable ref objects, so this still only runs once on mount/unmount.
   }, [containerRef, initialFocusRef])
 }

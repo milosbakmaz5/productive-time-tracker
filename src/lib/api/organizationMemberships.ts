@@ -8,12 +8,9 @@ interface OrganizationMembershipAttributes {
   updated_at: string
 }
 
-/**
- * Resolves the person_id for an organization membership.
- * Pass explicit `auth` at login time, before credentials are persisted - a failure there means
- * "wrong token/org," not "session expired," so it's excluded from the stored-session invalidation
- * flow. Omit `auth` to re-check the currently stored session instead.
- */
+/** Resolves the person_id for an organization membership. Pass explicit `auth` at login, before
+ * credentials are stored - a failure there means "wrong token," not "session expired," so it
+ * skips the session-invalidation flow. Omit `auth` to re-check the stored session instead. */
 export async function resolvePersonId(auth?: ApiAuth): Promise<string> {
   const organizationId = auth?.organizationId ?? loadCredentials()?.organizationId
   if (!organizationId) {

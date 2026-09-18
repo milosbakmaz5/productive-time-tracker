@@ -42,19 +42,11 @@ export function EntriesPage() {
   } = useQuery({
     queryKey: [...timeEntriesWeekQueryKey(personId), weekStart],
     queryFn: () => listTimeEntriesForRange(personId, weekStart, weekEnd),
-    // We already surface an explicit Retry button - default silent retries would just delay
-    // showing a real failure by several seconds behind a loading indicator.
-    retry: false,
-    // Default 'online' mode pauses the query while the browser reports offline, rather than
-    // letting it fail - so a genuinely offline user saw an indefinite spinner with no feedback
-    // at all. 'always' lets the real fetch() attempt happen and fail normally into isError,
-    // reusing the same error+retry UI as any other failure.
-    networkMode: 'always',
+    retry: false, // We already have an explicit Retry button - silent retries just delay the error.
+    networkMode: 'always', // Default 'online' mode leaves an offline user stuck on a silent spinner.
   })
 
-  // Defaults to [] (rather than leaving it undefined while weekEntries hasn't loaded) so the
-  // render logic below never has to juggle an "entries is present but might be undefined" case -
-  // isPending/isError already gate whether this array's content means anything.
+  // Defaults to [] rather than undefined, so isPending/isError alone gate what it means below.
   const entries = useMemo(() => weekEntries?.filter((entry) => entry.date === date) ?? [], [weekEntries, date])
   const hasLoaded = !isPending && !isError
   const shouldShowEmptyState = hasLoaded && entries.length === 0

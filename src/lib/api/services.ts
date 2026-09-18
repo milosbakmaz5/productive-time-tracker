@@ -2,13 +2,9 @@ import { apiFetch } from './client'
 import { ApiError } from './errors'
 import type { JsonApiCollectionDocument } from './types'
 
-/**
- * Every Productive time entry requires a service_id, but this app's create/edit form
- * (per the assignment) only exposes duration, date, and description. Rather than hardcode
- * a service, we replicate Productive's own default-resolution: service_suggestions returns
- * the service that person would suggest for that date, matching their own "quick add" flow.
- * Falls back to the first bookable service for that person/date if there's no suggestion.
- */
+/** Every time entry needs a service_id, but the assignment's form has no service picker. Uses
+ * Productive's own service_suggestions default-resolution instead of hardcoding one, falling
+ * back to the first bookable service if there's no suggestion. */
 export async function resolveServiceId(personId: string, date: string): Promise<string> {
   const suggestions = await apiFetch<JsonApiCollectionDocument<unknown>>('/service_suggestions', {
     query: {

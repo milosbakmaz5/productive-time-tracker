@@ -30,9 +30,8 @@ export async function getTimeEntry(id: string): Promise<TimeEntry> {
   return toTimeEntry(doc.data)
 }
 
-/** Prefix-matches every cached week query for this person regardless of which week, so callers
- * that change one entry don't need to work out exactly which week(s) it falls into (including
- * the edge case of an edit moving an entry across a week boundary). */
+/** Prefix-matches every cached week query for this person, so callers invalidating after a
+ * mutation don't need to work out which week(s) it actually falls into. */
 export function timeEntriesWeekQueryKey(personId: string) {
   return ['time-entries-week', personId] as const
 }

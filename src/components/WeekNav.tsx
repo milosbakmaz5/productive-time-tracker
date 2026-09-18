@@ -15,17 +15,13 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
   const todayDate = today()
   const dateInputRef = useRef<HTMLInputElement>(null)
 
-  // Navigating to a week lands on today if today falls in that week, otherwise the week's first
-  // day - rather than preserving the currently-selected weekday, which would make "today" scroll
-  // out of view as soon as you'd navigated away from its week.
+  // Lands on today if it's in the target week, otherwise that week's Monday.
   function goToWeek(targetWeekStart: string) {
     const targetDays = weekDays(targetWeekStart)
     onSelectDate(targetDays.includes(todayDate) ? todayDate : targetWeekStart)
   }
 
-  // The week range label opens a native date picker rather than a hand-built calendar - a
-  // hidden date input (synced to the selected date, so the picker opens where you'd expect)
-  // sits behind the visible label/chevron button and is triggered programmatically.
+  // Triggers a hidden, synced date input's native picker instead of a hand-built calendar.
   function openDatePicker() {
     try {
       dateInputRef.current?.showPicker?.()

@@ -15,8 +15,8 @@ interface RequestOptions {
   query?: Record<string, string>
   /** Explicit credentials, for calls made before login (e.g. token validation) that can't read from storage. */
   auth?: ApiAuth
-  /** Skip auto-logout-on-401/403 - for login-time calls where nothing is stored yet, so a bad
-   * token just means "invalid credentials," not "existing session expired." */
+  /** Skip auto-logout-on-401/403 - for login-time calls, where a bad token means "invalid
+   * credentials," not "session expired." */
   skipSessionInvalidation?: boolean
 }
 

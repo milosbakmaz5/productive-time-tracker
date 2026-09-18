@@ -5,9 +5,8 @@ import { Link, useLocation } from 'react-router-dom'
 interface EntryActionsMenuProps {
   entryId: string
   onDelete: () => void
-  /** True while an inline note/duration edit for this entry is saving - closes the menu (a save
-   * kicked off by blurring one of those fields can fire in the same click that opens this menu),
-   * disables opening it again, and swaps the trigger icon for a spinner until the save settles. */
+  /** True while an inline note/duration edit is saving - closes the menu, disables reopening it,
+   * and shows a spinner until the save settles. */
   isSaving?: boolean
 }
 
@@ -36,9 +35,7 @@ export function EntryActionsMenu({ entryId, onDelete, isSaving }: EntryActionsMe
     }
   }, [isOpen])
 
-  // A save starting (e.g. from blurring a field this same click also opened the menu from)
-  // closes the menu - adjusted during render, same pattern as the note/duration editors' sync
-  // logic, rather than an effect that would trigger an extra render.
+  // Adjusted during render, not an effect - same pattern as the note/duration editors.
   if (isSaving && isOpen) {
     setIsOpen(false)
   }

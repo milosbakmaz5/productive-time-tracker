@@ -33,10 +33,7 @@ export class ApiError extends Error {
     this.details = details
   }
 
-  /**
-   * Builds an ApiError from a failed response, preferring Productive's own JSON:API error detail
-   * over a generic "Productive API error (422)" message wherever the body has one to offer.
-   */
+  /** Prefers Productive's own JSON:API error detail over a generic "(422)" message. */
   static fromResponse(status: number, body: unknown): ApiError {
     const first = extractFirstError(body)
     if (first) {

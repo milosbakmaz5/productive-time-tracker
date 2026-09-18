@@ -13,13 +13,8 @@ function systemTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-/**
- * Tracks the theme actually in effect (an explicit stored choice, falling back to the OS
- * setting) and exposes a setter that persists the choice and applies it to <html> via
- * `data-theme`, which index.css's `[data-theme="dark"]`/`:not([data-theme="light"])` rules key
- * off of. Once a user makes an explicit choice, this stops following OS changes - that's the
- * point of overriding it.
- */
+/** Tracks the effective theme (stored choice, falling back to the OS setting) and exposes a
+ * setter that persists it and sets `data-theme` on `<html>` for index.css's rules to key off. */
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => getStoredTheme() ?? systemTheme())
 

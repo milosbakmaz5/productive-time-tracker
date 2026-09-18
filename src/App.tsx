@@ -11,10 +11,9 @@ interface NavigationState {
 
 function App() {
   const location = useLocation()
-  // Set by EntriesPage's Edit link, so the edit route renders as a modal over the list it
-  // came from instead of replacing it - while still being a real, bookmarkable/refreshable
-  // route on its own (the assignment requires editing to "exist in its own route"). Direct
-  // navigation to the edit URL (no background state) falls back to rendering it standalone.
+  // Set by EntriesPage's Edit link so the edit route renders as a modal over the list instead
+  // of replacing it, while staying a real, bookmarkable route on its own. Direct navigation
+  // (no background state) falls back to rendering it standalone.
   const backgroundLocation = (location.state as NavigationState | null)?.backgroundLocation
 
   return (
