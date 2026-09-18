@@ -41,7 +41,7 @@ Required headers on every request: `X-Auth-Token`, `X-Organization-Id`, `Content
 | Purpose | Request |
 |---|---|
 | Resolve person from org | `GET /organization_memberships?filter[organization_id]=<orgId>` |
-| List entries for a date | `GET /time_entries?filter[person_id]=<id>&filter[date]=<YYYY-MM-DD>` |
+| List entries for a date range | `GET /time_entries?filter[person_id]=<id>&filter[date][gt_eq]=<from>&filter[date][lt_eq]=<to>` (the week view fetches the whole Monday–Sunday range in one call; a single day is just `from === to`) |
 | Resolve a default service for create | `GET /service_suggestions?filter[person_id]=<id>&filter[date][gt_eq]=<date>&filter[date][lt_eq]=<date>` (fallback: `GET /services?filter[time_tracking_enabled]=true&filter[bookable_date]=<date>&filter[person_id]=<id>`) |
 | Create an entry | `POST /time_entries` |
 | Edit an entry | `PATCH /time_entries/:id` |
@@ -56,11 +56,11 @@ The assignment's create/edit form only exposes duration, date, and description �
 ```json
 {
   "data": {
-    "type": "time_entries",
+    "type": "time-entries",
     "attributes": {
       "date": "2026-09-14",
       "time": 180,
-      "note": "plain text description"
+      "note": "<ul><li><p>plain text description</p></li></ul>"
     },
     "relationships": {
       "person": { "data": { "type": "people", "id": "<personId>" } },
@@ -70,13 +70,15 @@ The assignment's create/edit form only exposes duration, date, and description �
 }
 ```
 
+Note `"type": "time-entries"` is hyphenated on write, unlike the underscored `"time_entries"` GET responses use for the same resource - confirmed from a captured real create request; a body sent with the underscored form is rejected.
+
 ### Duration format
 
-The API stores `time` as an integer number of minutes. The UI form will collect duration in _(TBD as the form is built — documenting the exact input format and conversion here once implemented)_.
+The API stores `time` as an integer number of minutes. The UI accepts either `HH:MM` or a single free-form number (interpreted as hours or minutes depending on magnitude), converting to minutes before sending - the full parsing rules are in §6's duration input write-up.
 
 ### Description format
 
-Productive's own UI stores `note` as HTML (its editor is rich-text). The API does not require HTML — this app uses a plain `<textarea>` and sends plain text, which is a deliberate simplification given the assignment's 10-hour scope, not an API constraint.
+Productive's own UI stores `note` as HTML (its editor is rich-text) - not just as a matter of how their app happens to render it, but as what the API itself expects back for descriptions to display correctly in Productive's real UI. This app's own list/create/edit UI is a plain `<textarea>` with a bullet-list convention layered on top (see §6), but `note` is serialized to that same HTML shape (`noteToHtml`/`stripHtml` in `src/lib/html.ts`) before every write and after every read, so entries created here render correctly in Productive's own app too, and vice versa.
 
 ### Client code layout
 
@@ -86,7 +88,7 @@ Productive's own UI stores `note` as HTML (its editor is rich-text). The API doe
 - `src/lib/api/services.ts` — the `service_id` auto-resolution described above.
 - `src/lib/api/timeEntries.ts` — list/create/update/delete.
 
-**Open item to verify empirically**: `POST`/`PATCH` bodies use `"type": "time-entries"` (hyphenated), confirmed from a captured real create request. `service_suggestions`' actual response shape wasn't captured directly — `resolveServiceId` handles two plausible shapes (a `service` relationship, or the suggestion resource being a `services` resource itself) with a fallback to `/services` if neither matches. This will get exercised for real once the create flow is wired up and tested end-to-end against the test account.
+`resolveServiceId` handles two plausible `service_suggestions` response shapes (a `service` relationship, or the suggestion resource being a `services` resource itself), with a fallback to `/services` if neither matches - both paths, plus the fallback, have been exercised against the real test account.
 
 ### Platform quirk: relationships require explicit `include`
 
@@ -200,7 +202,9 @@ This is reactive (shown on a failed submit) rather than proactive. Productive's 
 
 ## 7. What's tested / not tested
 
-_(To be filled in — given the time budget, expect light coverage: API layer unit tests, not full e2e.)_
+No automated test suite - given the 10-hour scope, effort went into manually verifying every feature end-to-end against the real Productive API (the test account referenced throughout this document) rather than writing tests around a hand-rolled mock of that API's behavior. Each feature was checked directly in the browser as it was built: login/logout/session persistence across a refresh, create/list/edit/delete against real `time_entries` records, the `service_id` auto-resolution and its fallback path, HTML note round-tripping (creating a note here and confirming it renders correctly in Productive's own web UI, and vice versa), the duration parser's branches (hours vs. minutes vs. `HH:MM`, the 24h cap), loading/empty/error states (including a real offline check via DevTools' network throttle), and the responsive/mobile layout at multiple viewport widths.
+
+Not covered: no unit tests for the pure logic modules (`duration.ts`, `note.ts`, `html.ts`, `week.ts`) that would be the natural first candidates if this were extended past the take-home scope - they're small, dependency-free functions with clear inputs/outputs, well-suited to it. No automated regression suite, so every session's changes were re-verified by hand rather than caught by a test run.
 
 ## 8. Known limitations / out of scope
 
@@ -208,3 +212,4 @@ _(To be filled in — given the time budget, expect light coverage: API layer un
 - No rich-text description editor (see §4).
 - No pagination UI for a single day's entries (Productive's own per-day entry count is small; `per_page` is set generously and not paged in the UI).
 - Only the current user's own time entries are manageable — no team/approval features, matching the assignment's explicit scope.
+- **Deliberate deviation**: User Story 1's acceptance criteria lists the date as one of each entry's displayed fields, alongside duration and description. This app omits it from the card itself - the whole list is already scoped to one selected date (shown once, via the week strip and header, rather than repeated identically on every card below it), so a per-card date would just repeat information already established by the page's context. Flagged explicitly here rather than silently dropped, since it's a literal reading of the acceptance criteria this app doesn't follow.
