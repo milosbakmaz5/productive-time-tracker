@@ -52,7 +52,7 @@ export function EntryActionsMenu({ entryId, onDelete, isSaving }: EntryActionsMe
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={isSaving ? 'Saving entry…' : 'Entry actions'}
-        className="rounded-md p-1 text-faint-foreground hover:bg-surface-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-70"
+        className="rounded p-1 text-faint-foreground hover:bg-surface-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-70"
       >
         {isSaving ? (
           <Loader2 size={16} className="animate-spin" aria-hidden="true" />
@@ -64,7 +64,7 @@ export function EntryActionsMenu({ entryId, onDelete, isSaving }: EntryActionsMe
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 z-10 mt-1 w-32 overflow-hidden rounded-md border border-border bg-surface py-1 shadow-lg"
+          className="absolute right-0 z-10 mt-1 w-32 overflow-hidden rounded border border-border bg-surface py-1 shadow-lg"
         >
           <Link
             to={`/entries/${entryId}/edit`}

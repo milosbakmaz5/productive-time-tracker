@@ -31,7 +31,7 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-label={title}
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-xl"
+        className="w-full max-w-sm rounded-lg bg-surface p-6 shadow-xl"
       >
         <h2 className="text-base font-semibold text-foreground">{title}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{message}</p>
@@ -45,7 +45,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onCancel}
             disabled={isConfirming}
-            className="rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover disabled:opacity-50"
+            className="rounded px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover disabled:opacity-50"
           >
             {cancelLabel}
           </button>
@@ -53,7 +53,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={isConfirming}
-            className="rounded-md bg-error px-4 py-2 text-sm font-medium text-white hover:bg-error-hover disabled:opacity-50"
+            className="rounded bg-error px-4 py-2 text-sm font-medium text-white hover:bg-error-hover disabled:opacity-50"
           >
             {confirmLabel}
           </button>

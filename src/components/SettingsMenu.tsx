@@ -41,7 +41,7 @@ export function SettingsMenu({ onLogout }: SettingsMenuProps) {
         aria-expanded={isOpen}
         aria-label="Settings"
         title="Settings"
-        className="rounded-md p-1.5 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+        className="rounded p-1.5 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
       >
         <Settings size={16} aria-hidden="true" />
       </button>
@@ -49,7 +49,7 @@ export function SettingsMenu({ onLogout }: SettingsMenuProps) {
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 z-10 mt-1 w-44 overflow-hidden rounded-md border border-border bg-surface py-1 shadow-lg"
+          className="absolute right-0 z-10 mt-1 w-44 overflow-hidden rounded border border-border bg-surface py-1 shadow-lg"
         >
           {/* A toggle stays open on click (unlike Log out) so it can be flipped back and forth
            * without reopening the menu each time. */}

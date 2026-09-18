@@ -79,14 +79,14 @@ export function AddEntryModal({ personId, defaultDate, onClose, onCreated }: Add
               type="button"
               onClick={requestClose}
               disabled={mutation.isPending}
-              className="rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover disabled:opacity-50"
+              className="rounded px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={parsedDuration.kind !== 'valid' || mutation.isPending}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+              className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
             >
               {mutation.isPending ? 'Adding…' : 'Add entry'}
             </button>

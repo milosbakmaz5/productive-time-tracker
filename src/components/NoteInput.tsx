@@ -100,9 +100,9 @@ export function NoteInput({
   }
 
   const boxedClassName =
-    'w-full resize-none rounded-md border border-border px-3 pt-2 pb-5 text-sm outline-none focus:border-primary'
+    'w-full resize-none rounded border border-border px-3 pt-2 pb-5 text-sm outline-none focus:border-primary'
   const plainClassName =
-    'w-full resize-none overflow-hidden bg-transparent text-sm text-muted-foreground outline-none placeholder:text-faint-foreground'
+    'w-full resize-none overflow-hidden bg-transparent text-sm text-foreground outline-none placeholder:text-faint-foreground'
 
   return (
     <textarea

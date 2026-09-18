@@ -16,7 +16,7 @@ export function EntryRow({ entry, onDelete }: EntryRowProps) {
   const [isDurationSaving, setIsDurationSaving] = useState(false)
 
   return (
-    <li className="rounded-lg border border-border bg-surface p-4 shadow-sm">
+    <li className="rounded-md border border-border bg-surface-hover p-4">
       <div className="flex items-start justify-between gap-3">
         <EntryNoteEditor entry={entry} onSavingChange={setIsNoteSaving} />
         <div className="flex shrink-0 items-start gap-2">

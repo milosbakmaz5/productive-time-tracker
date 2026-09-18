@@ -41,7 +41,7 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
         onClick={() => goToWeek(addDays(weekStart, -7))}
         aria-label="Previous week"
         title="Previous week"
-        className="rounded-md p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+        className="rounded p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
       >
         <ChevronLeft size={16} aria-hidden="true" />
       </button>
@@ -51,7 +51,7 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
         onClick={() => goToWeek(startOfWeek(todayDate))}
         aria-label="Go to this week"
         title="Go to this week"
-        className="flex size-6 shrink-0 items-center justify-center rounded-md hover:bg-surface-hover"
+        className="flex size-6 shrink-0 items-center justify-center rounded hover:bg-surface-hover"
       >
         <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
       </button>
@@ -61,7 +61,7 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
         onClick={() => goToWeek(addDays(weekStart, 7))}
         aria-label="Next week"
         title="Next week"
-        className="rounded-md p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+        className="rounded p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
       >
         <ChevronRight size={16} aria-hidden="true" />
       </button>
@@ -70,7 +70,7 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
         <button
           type="button"
           onClick={openDatePicker}
-          className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-foreground hover:bg-surface-hover"
+          className="flex items-center gap-1 rounded px-2 py-1 text-sm font-medium text-foreground hover:bg-surface-hover"
         >
           {weekRangeLabel(weekStart)}
           <ChevronDown size={14} aria-hidden="true" />

@@ -59,8 +59,8 @@ export function DurationInput({
           onFocus={handleFocus}
           onBlur={handleBlur}
           title={isOverMax ? parsed.message : undefined}
-          className={`w-14 rounded border bg-transparent px-1 text-sm font-semibold outline-none ${
-            isOverMax ? 'border-error text-error' : 'border-transparent text-foreground'
+          className={`w-13 rounded-sm border bg-background px-1 text-sm font-semibold outline-none ${
+            isOverMax ? 'border-error text-error' : 'border-border text-foreground'
           }`}
         />
         {shouldShowPreview && (
@@ -83,7 +83,7 @@ export function DurationInput({
         onFocus={handleFocus}
         onBlur={handleBlur}
         title={isOverMax ? parsed.message : undefined}
-        className={`w-20 rounded-md border px-3 py-2 text-sm outline-none ${
+        className={`w-20 rounded border px-3 py-2 text-sm outline-none ${
           isOverMax ? 'border-error focus:border-error' : 'border-border focus:border-primary'
         }`}
       />

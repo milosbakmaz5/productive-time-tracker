@@ -35,7 +35,7 @@
    * near-black background instead, which is the conventional "elevation" direction there too. */
   --surface: color-mix(in srgb, white 8%, var(--background));
   /* Hover/pressed feedback: the opposite direction - nudge toward the foreground color. */
-  --surface-hover: color-mix(in srgb, var(--foreground) 8%, var(--background));
+  --surface-hover: color-mix(in srgb, var(--foreground) 4%, var(--background));
   --border: color-mix(in srgb, var(--foreground) 15%, transparent);
   --border-strong: color-mix(in srgb, var(--foreground) 35%, transparent);
   --muted-foreground: color-mix(in srgb, var(--foreground) 68%, var(--background) 32%);

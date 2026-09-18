@@ -93,7 +93,7 @@ export function EntriesPage() {
                 type="button"
                 onClick={() => setIsAddOpen(true)}
                 aria-label="Add time entry"
-                className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover"
+                className="rounded bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover"
               >
                 <span className="hidden sm:inline">+ Add time entry</span>
                 <span className="sm:hidden" aria-hidden="true">
@@ -163,7 +163,7 @@ function EntriesLoading() {
   return (
     <div className="space-y-2" aria-busy="true" aria-label="Loading time entries">
       {[0, 1, 2].map((key) => (
-        <div key={key} className="h-16 animate-pulse rounded-lg border border-border bg-surface-hover" />
+        <div key={key} className="h-16 animate-pulse rounded-md border border-border bg-surface-hover" />
       ))}
     </div>
   )
@@ -171,7 +171,7 @@ function EntriesLoading() {
 
 function EntriesEmpty() {
   return (
-    <div className="rounded-lg border border-dashed border-border p-8 text-center">
+    <div className="rounded-md border border-dashed border-border p-8 text-center">
       <p className="text-sm text-muted-foreground">No time entries for this date.</p>
     </div>
   )
@@ -179,12 +179,12 @@ function EntriesEmpty() {
 
 function EntriesError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div role="alert" className="rounded-lg border border-error-border bg-error-surface p-6 text-center">
+    <div role="alert" className="rounded-md border border-error-border bg-error-surface p-6 text-center">
       <p className="text-sm text-error">Couldn't load time entries: {message}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-3 rounded-md bg-error px-4 py-1.5 text-sm font-medium text-white hover:bg-error-hover"
+        className="mt-3 rounded bg-error px-4 py-1.5 text-sm font-medium text-white hover:bg-error-hover"
       >
         Retry
       </button>

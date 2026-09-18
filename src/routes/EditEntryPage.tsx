@@ -31,7 +31,7 @@ export function EditEntryPage() {
   if (entryQuery.isPending) {
     return (
       <Modal title="Edit time entry" onClose={goBack}>
-        <div className="h-56 animate-pulse rounded-lg bg-surface-hover" aria-busy="true" />
+        <div className="h-56 animate-pulse rounded-md bg-surface-hover" aria-busy="true" />
       </Modal>
     )
   }
@@ -39,7 +39,7 @@ export function EditEntryPage() {
   if (entryQuery.isError) {
     return (
       <Modal title="Edit time entry" onClose={goBack}>
-        <div role="alert" className="rounded-lg border border-error-border bg-error-surface p-6 text-center">
+        <div role="alert" className="rounded-md border border-error-border bg-error-surface p-6 text-center">
           <p className="text-sm text-error">
             Couldn't load this entry:{' '}
             {getErrorMessage(entryQuery.error)}
@@ -48,14 +48,14 @@ export function EditEntryPage() {
             <button
               type="button"
               onClick={() => entryQuery.refetch()}
-              className="rounded-md bg-error px-4 py-1.5 text-sm font-medium text-white hover:bg-error-hover"
+              className="rounded bg-error px-4 py-1.5 text-sm font-medium text-white hover:bg-error-hover"
             >
               Retry
             </button>
             <button
               type="button"
               onClick={goBack}
-              className="rounded-md px-4 py-1.5 text-sm font-medium text-muted-foreground hover:bg-surface-hover"
+              className="rounded px-4 py-1.5 text-sm font-medium text-muted-foreground hover:bg-surface-hover"
             >
               Back to list
             </button>
@@ -143,14 +143,14 @@ function EditEntryForm({ entry, onBack }: { entry: TimeEntry; onBack: () => void
               type="button"
               onClick={requestClose}
               disabled={mutation.isPending}
-              className="rounded-md px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover disabled:opacity-50"
+              className="rounded px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={parsedDuration.kind !== 'valid' || mutation.isPending}
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+              className="rounded bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
             >
               {mutation.isPending ? 'Saving…' : 'Save changes'}
             </button>

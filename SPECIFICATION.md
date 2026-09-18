@@ -23,6 +23,8 @@ Only six colors are hand-picked (generated via [realtimecolors.com](https://www.
 
 Dark mode is wired via `@media (prefers-color-scheme: dark)` re-defining the same six custom properties, so it follows the OS-level setting by default. A toggle inside the header's settings menu (see below) lets the user override this explicitly: `useTheme` (`src/lib/theme.ts`) persists the choice to `localStorage` and sets `data-theme="dark"|"light"` on `<html>`, which `index.css` gives priority over the media query (`:root[data-theme="dark"]` for an explicit dark choice; `:root:not([data-theme="light"])` inside the media query, so an explicit light choice opts out even when the OS is dark). Once a user makes an explicit choice, the app stops following further OS-level changes - overriding was the point. A small inline script in `index.html` applies any stored override before React mounts, so there's no flash of the wrong theme on load.
 
+Corner rounding follows Tailwind's default scale shifted down one step everywhere, keeping the same relative hierarchy just tightened up: dialogs/cards (`rounded-xl`→`rounded-lg`), list items and inline status boxes (`rounded-lg`→`rounded-md`), buttons/inputs/dropdowns (`rounded-md`→`rounded`). Functional circular shapes (the toggle switch, the week strip's today-marker dome) are untouched - the shift is about flattening rectangular corners, not resizing intentional circles.
+
 ## 3. Authentication
 
 - Login screen collects a Productive **API token** and **organization ID**.
@@ -147,7 +149,7 @@ Verified empirically: `api.productive.io` returns permissive CORS headers and ac
 
 ### Entry card: layout and inline note editing
 
-Each list card shows the description top-left and duration (`HH:MM`, via `formatAsHHMM` - not the earlier `Xh Ym` `formatDuration`, now removed as dead code) + the "⋮" menu top-right; the date is not shown per-card, since the whole list is already scoped to one selected date.
+Each list card shows the description top-left and duration (`HH:MM`, via `formatAsHHMM` - not the earlier `Xh Ym` `formatDuration`, now removed as dead code) + the "⋮" menu top-right; the date is not shown per-card, since the whole list is already scoped to one selected date. Cards are flat - `bg-surface-hover` (the same token the header uses) and a border, no drop shadow - rather than looking like elevated, floating surfaces; shadows are reserved for things genuinely floating above the page (modals, dropdown menus), not applied to content that's just part of the normal page flow.
 
 The description is editable directly in the list - click it, edit, and it saves on blur - rather than only through the edit modal. `EntryNoteEditor` (`src/components/EntryNoteEditor.tsx`) owns this:
 

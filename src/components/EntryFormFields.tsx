@@ -35,7 +35,7 @@ export function EntryFormFields({
           required
           value={date}
           onChange={(event) => onDateChange(event.target.value)}
-          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm outline-none focus:border-primary"
+          className="mt-1 block w-full rounded border border-border px-3 py-2 text-sm outline-none focus:border-primary"
         />
       </label>
 
