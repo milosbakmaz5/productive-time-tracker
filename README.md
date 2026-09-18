@@ -25,3 +25,11 @@ On first load you'll be asked for a Productive API token and organization ID (Se
 ```bash
 npm run build
 ```
+
+## Test
+
+```bash
+npm run test
+```
+
+Unit tests for the pure logic modules (duration parsing, week/date math, HTML note serialization, error-message extraction) - see SPECIFICATION.md §7 for what is and isn't covered.
