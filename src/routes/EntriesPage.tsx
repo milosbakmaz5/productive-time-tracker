@@ -3,9 +3,7 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AddEntryModal } from '../components/AddEntryModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
-import { EntryActionsMenu } from '../components/EntryActionsMenu'
-import { EntryDurationEditor } from '../components/EntryDurationEditor'
-import { EntryNoteEditor } from '../components/EntryNoteEditor'
+import { EntryRow } from '../components/EntryRow'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { WeekDayStrip } from '../components/WeekDayStrip'
 import { deleteTimeEntry, listTimeEntriesForRange, timeEntriesWeekQueryKey } from '../lib/api/timeEntries'
@@ -38,7 +36,6 @@ export function EntriesPage() {
     isPending,
     isError,
     error,
-    isFetching,
     refetch,
   } = useQuery({
     queryKey: [...timeEntriesWeekQueryKey(personId), weekStart],
@@ -95,30 +92,14 @@ export function EntriesPage() {
       </header>
 
       <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
-        <div className="flex items-center justify-between gap-3">
-          <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-            Date
-            <input
-              type="date"
-              value={date}
-              onChange={(event) => setDate(event.target.value)}
-              className="rounded-md border border-border px-3 py-1.5 text-sm outline-none focus:border-primary"
-            />
-          </label>
-          <div className="flex items-center gap-3">
-            {isFetching && !isPending && (
-              <span className="text-xs text-faint-foreground" aria-live="polite">
-                Updating…
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={() => setIsAddOpen(true)}
-              className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover"
-            >
-              + Add time entry
-            </button>
-          </div>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setIsAddOpen(true)}
+            className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover"
+          >
+            + Add time entry
+          </button>
         </div>
 
         <div className="mt-4">
@@ -146,15 +127,7 @@ export function EntriesPage() {
           {!isPending && !isError && entries && entries.length > 0 && (
             <ul className="space-y-2">
               {entries.map((entry) => (
-                <li key={entry.id} className="rounded-lg border border-border bg-surface p-4 shadow-sm">
-                  <div className="flex items-start justify-between gap-3">
-                    <EntryNoteEditor entry={entry} />
-                    <div className="flex shrink-0 items-start gap-2">
-                      <EntryDurationEditor entry={entry} />
-                      <EntryActionsMenu entryId={entry.id} onDelete={() => requestDelete(entry.id)} />
-                    </div>
-                  </div>
-                </li>
+                <EntryRow key={entry.id} entry={entry} onDelete={() => requestDelete(entry.id)} />
               ))}
             </ul>
           )}

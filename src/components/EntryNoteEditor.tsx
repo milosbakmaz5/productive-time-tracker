@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { timeEntriesWeekQueryKey, updateTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { EMPTY_NOTE, normalizeNoteForSubmit } from '../lib/note'
@@ -7,6 +7,9 @@ import { NoteInput } from './NoteInput'
 
 interface EntryNoteEditorProps {
   entry: TimeEntry
+  /** Reports whether a save is currently in flight, so a shared parent (EntryRow) can disable
+   * the entry's actions menu while either this or the duration editor is saving. */
+  onSavingChange?: (isSaving: boolean) => void
 }
 
 /**
@@ -16,7 +19,7 @@ interface EntryNoteEditorProps {
  * elements on click would put the textarea in the DOM only after the click already happened,
  * losing the cursor position the click was meant to set.
  */
-export function EntryNoteEditor({ entry }: EntryNoteEditorProps) {
+export function EntryNoteEditor({ entry, onSavingChange }: EntryNoteEditorProps) {
   const queryClient = useQueryClient()
   const { credentials } = useAuth()
   const personId = credentials!.personId
@@ -50,6 +53,10 @@ export function EntryNoteEditor({ entry }: EntryNoteEditorProps) {
       queryClient.invalidateQueries({ queryKey: timeEntriesWeekQueryKey(personId) })
     },
   })
+
+  useEffect(() => {
+    onSavingChange?.(mutation.isPending)
+  }, [mutation.isPending, onSavingChange])
 
   function handleBlur() {
     const normalizedDraft = normalizeNoteForSubmit(draft)

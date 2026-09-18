@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { formatAsHHMM } from '../lib/duration'
 import { today } from '../lib/format'
 import { addDays, dayLabel, weekDays, weekRangeLabel } from '../lib/week'
@@ -14,6 +15,7 @@ export function WeekDayStrip({ weekStart, selectedDate, dailyTotals, onSelectDat
   const days = weekDays(weekStart)
   const weeklyTotal = days.reduce((sum, day) => sum + (dailyTotals[day] ?? 0), 0)
   const todayDate = today()
+  const dateInputRef = useRef<HTMLInputElement>(null)
 
   // Navigating to a week lands on today if today falls in that week, otherwise the week's first
   // day - rather than preserving the currently-selected weekday, which would make "today" scroll
@@ -21,6 +23,17 @@ export function WeekDayStrip({ weekStart, selectedDate, dailyTotals, onSelectDat
   function goToWeek(targetWeekStart: string) {
     const targetDays = weekDays(targetWeekStart)
     onSelectDate(targetDays.includes(todayDate) ? todayDate : targetWeekStart)
+  }
+
+  // The week range label opens a native date picker rather than a hand-built calendar - a
+  // hidden date input (synced to the selected date, so the picker opens where you'd expect)
+  // sits behind the visible label/chevron button and is triggered programmatically.
+  function openDatePicker() {
+    try {
+      dateInputRef.current?.showPicker?.()
+    } catch {
+      dateInputRef.current?.focus()
+    }
   }
 
   return (
@@ -34,7 +47,27 @@ export function WeekDayStrip({ weekStart, selectedDate, dailyTotals, onSelectDat
         >
           <ChevronIcon direction="left" />
         </button>
-        <span className="w-32 text-center text-sm font-medium text-foreground">{weekRangeLabel(weekStart)}</span>
+
+        <div className="relative">
+          <button
+            type="button"
+            onClick={openDatePicker}
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-foreground hover:bg-surface-hover"
+          >
+            {weekRangeLabel(weekStart)}
+            <ChevronDownIcon />
+          </button>
+          <input
+            ref={dateInputRef}
+            type="date"
+            value={selectedDate}
+            onChange={(event) => onSelectDate(event.target.value)}
+            tabIndex={-1}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-0"
+          />
+        </div>
+
         <button
           type="button"
           onClick={() => goToWeek(addDays(weekStart, 7))}
@@ -92,6 +125,14 @@ function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d={d} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function ChevronDownIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }

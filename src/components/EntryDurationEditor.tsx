@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { timeEntriesWeekQueryKey, updateTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { useAuth } from '../lib/auth/useAuth'
 import { formatAsHHMM, parseDurationInput } from '../lib/duration'
@@ -7,12 +7,15 @@ import { DurationInput } from './DurationInput'
 
 interface EntryDurationEditorProps {
   entry: TimeEntry
+  /** Reports whether a save is currently in flight, so a shared parent (EntryRow) can disable
+   * the entry's actions menu while either this or the note editor is saving. */
+  onSavingChange?: (isSaving: boolean) => void
 }
 
 /** Click the duration in the list to edit it in place, same parsing/blur-reformat/select-on-focus
  * logic as the create/edit forms' DurationInput - just the 'plain' variant, with the live HH:MM
  * preview below the input instead of beside it. Saves on blur, mirroring EntryNoteEditor. */
-export function EntryDurationEditor({ entry }: EntryDurationEditorProps) {
+export function EntryDurationEditor({ entry, onSavingChange }: EntryDurationEditorProps) {
   const queryClient = useQueryClient()
   const { credentials } = useAuth()
   const personId = credentials!.personId
@@ -35,6 +38,10 @@ export function EntryDurationEditor({ entry }: EntryDurationEditorProps) {
       queryClient.invalidateQueries({ queryKey: timeEntriesWeekQueryKey(personId) })
     },
   })
+
+  useEffect(() => {
+    onSavingChange?.(mutation.isPending)
+  }, [mutation.isPending, onSavingChange])
 
   function handleBlur() {
     const parsed = parseDurationInput(draft)
