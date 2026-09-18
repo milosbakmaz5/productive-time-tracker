@@ -1,4 +1,4 @@
-import type { FocusEvent } from 'react'
+import { forwardRef, type FocusEvent } from 'react'
 import { formatAsHHMM, parseDurationInput } from '../lib/duration'
 
 interface DurationInputProps {
@@ -13,14 +13,10 @@ interface DurationInputProps {
   onBlur?: () => void
 }
 
-export function DurationInput({
-  value,
-  onChange,
-  variant = 'boxed',
-  readOnly = false,
-  onFocus,
-  onBlur,
-}: DurationInputProps) {
+export const DurationInput = forwardRef<HTMLInputElement, DurationInputProps>(function DurationInput(
+  { value, onChange, variant = 'boxed', readOnly = false, onFocus, onBlur },
+  ref,
+) {
   const parsed = parseDurationInput(value)
   const isOverMax = parsed.kind === 'exceeds-max'
   // The 'plain' variant's live HH:MM preview only makes sense while actively editing, and gets
@@ -50,6 +46,7 @@ export function DurationInput({
     return (
       <div>
         <input
+          ref={ref}
           type="text"
           inputMode="decimal"
           placeholder="00:00"
@@ -75,6 +72,7 @@ export function DurationInput({
   return (
     <div className="flex items-center gap-2">
       <input
+        ref={ref}
         type="text"
         inputMode="decimal"
         placeholder="00:00"
@@ -92,4 +90,4 @@ export function DurationInput({
       )}
     </div>
   )
-}
+})

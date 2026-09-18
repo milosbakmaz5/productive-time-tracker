@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EntryFormFields } from '../components/EntryFormFields'
@@ -26,14 +26,14 @@ export function EditEntryPage() {
     navigate(-1)
   }
 
-  // Loading/error states have nothing to lose yet, so their Modal can close directly - only the
-  // loaded form (below) needs the unsaved-changes guard, and it owns that state itself.
+  // Renders nothing while pending rather than a loading-skeleton Modal: the query usually
+  // resolves fast enough that a skeleton Modal immediately swapped for the real one just
+  // flashed one overlay into another (and, with Modal's focus trap, yanked focus twice in a
+  // row). The error state below still gets its own Modal, since it isn't a fleeting frame - the
+  // user may sit on it and needs Retry/Back to be reachable. Neither needs the unsaved-changes
+  // guard the loaded form (below) has - there's nothing to lose yet.
   if (entryQuery.isPending) {
-    return (
-      <Modal title="Edit time entry" onClose={goBack}>
-        <div className="h-56 animate-pulse rounded-md bg-surface-hover" aria-busy="true" />
-      </Modal>
-    )
+    return null
   }
 
   if (entryQuery.isError) {
@@ -72,6 +72,7 @@ function EditEntryForm({ entry, onBack }: { entry: TimeEntry; onBack: () => void
   const queryClient = useQueryClient()
   const { credentials } = useAuth()
   const personId = credentials!.personId
+  const durationInputRef = useRef<HTMLInputElement>(null)
 
   const initialDuration = formatAsHHMM(entry.time)
   const initialNote = entry.note || EMPTY_NOTE
@@ -121,7 +122,7 @@ function EditEntryForm({ entry, onBack }: { entry: TimeEntry; onBack: () => void
 
   return (
     <>
-      <Modal title="Edit time entry" onClose={requestClose}>
+      <Modal title="Edit time entry" onClose={requestClose} initialFocusRef={durationInputRef}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <EntryFormFields
             durationText={durationText}
@@ -130,6 +131,7 @@ function EditEntryForm({ entry, onBack }: { entry: TimeEntry; onBack: () => void
             onDateChange={setDate}
             note={note}
             onNoteChange={setNote}
+            durationInputRef={durationInputRef}
           />
 
           {mutation.isError && (

@@ -1,3 +1,4 @@
+import type { RefObject } from 'react'
 import { DurationInput } from './DurationInput'
 import { NoteInput } from './NoteInput'
 
@@ -8,6 +9,9 @@ interface EntryFormFieldsProps {
   onDateChange: (value: string) => void
   note: string
   onNoteChange: (value: string) => void
+  /** Forwarded to the duration field so the parent Modal can focus it first when opening -
+   * otherwise the modal's own Close button, first in DOM order, would get initial focus. */
+  durationInputRef?: RefObject<HTMLInputElement | null>
 }
 
 /** Duration/date/note fields shared by the create modal and the edit page. */
@@ -18,13 +22,14 @@ export function EntryFormFields({
   onDateChange,
   note,
   onNoteChange,
+  durationInputRef,
 }: EntryFormFieldsProps) {
   return (
     <>
       <label className="block text-sm font-medium text-foreground">
         Duration
         <div className="mt-1">
-          <DurationInput value={durationText} onChange={onDurationChange} />
+          <DurationInput ref={durationInputRef} value={durationText} onChange={onDurationChange} />
         </div>
       </label>
 

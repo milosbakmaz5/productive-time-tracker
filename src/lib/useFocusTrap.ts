@@ -5,18 +5,23 @@ const FOCUSABLE_SELECTOR =
 
 /**
  * Standard modal focus behavior, missing before this: moves focus into the dialog when it opens
- * (the first focusable element, or the container itself if it has none), keeps Tab/Shift+Tab
- * cycling within it instead of escaping to the page behind, and restores focus to whatever
- * triggered the dialog once it closes - the element itself, not just "somewhere sensible", since
- * `document.activeElement` at mount time *is* the trigger.
+ * (`initialFocusRef`'s element if given and present, otherwise the first focusable element, or
+ * the container itself if it has none), keeps Tab/Shift+Tab cycling within it instead of
+ * escaping to the page behind, and restores focus to whatever triggered the dialog once it
+ * closes - the element itself, not just "somewhere sensible", since `document.activeElement` at
+ * mount time *is* the trigger.
  */
-export function useFocusTrap(containerRef: RefObject<HTMLElement | null>) {
+export function useFocusTrap(
+  containerRef: RefObject<HTMLElement | null>,
+  initialFocusRef?: RefObject<HTMLElement | null>,
+) {
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
     const previouslyFocused = document.activeElement as HTMLElement | null
-    const initial = container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)[0] ?? container
+    const initial =
+      initialFocusRef?.current ?? container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)[0] ?? container
     initial.focus()
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -42,7 +47,7 @@ export function useFocusTrap(containerRef: RefObject<HTMLElement | null>) {
       document.removeEventListener('keydown', handleKeyDown)
       previouslyFocused?.focus()
     }
-    // containerRef itself (the object from useRef) never changes identity across re-renders,
-    // so this still only runs once on mount/unmount despite listing it here.
-  }, [containerRef])
+    // Both refs (the objects from useRef) never change identity across re-renders, so this
+    // still only runs once on mount/unmount despite listing them here.
+  }, [containerRef, initialFocusRef])
 }

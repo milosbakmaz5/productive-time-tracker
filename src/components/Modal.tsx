@@ -1,15 +1,18 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { useFocusTrap } from '../lib/useFocusTrap'
 
 interface ModalProps {
   title: string
   onClose: () => void
   children: ReactNode
+  /** Focuses this element when the modal opens instead of the first focusable element in DOM
+   * order (which would otherwise always be the Close button). */
+  initialFocusRef?: RefObject<HTMLElement | null>
 }
 
-export function Modal({ title, onClose, children }: ModalProps) {
+export function Modal({ title, onClose, children, initialFocusRef }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
-  useFocusTrap(dialogRef)
+  useFocusTrap(dialogRef, initialFocusRef)
 
   useEffect(() => {
     function handleKeyDown(event: globalThis.KeyboardEvent) {

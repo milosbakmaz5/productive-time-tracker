@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { getErrorMessage } from '../lib/api/errors'
 import { createTimeEntry, type TimeEntry } from '../lib/api/timeEntries'
 import { resolveServiceId } from '../lib/api/services'
@@ -17,6 +17,7 @@ interface AddEntryModalProps {
 }
 
 export function AddEntryModal({ personId, defaultDate, onClose, onCreated }: AddEntryModalProps) {
+  const durationInputRef = useRef<HTMLInputElement>(null)
   const [durationText, setDurationText] = useState('')
   const [date, setDate] = useState(defaultDate)
   const [note, setNote] = useState(EMPTY_NOTE)
@@ -57,7 +58,7 @@ export function AddEntryModal({ personId, defaultDate, onClose, onCreated }: Add
 
   return (
     <>
-      <Modal title="Add time entry" onClose={requestClose}>
+      <Modal title="Add time entry" onClose={requestClose} initialFocusRef={durationInputRef}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <EntryFormFields
             durationText={durationText}
@@ -66,6 +67,7 @@ export function AddEntryModal({ personId, defaultDate, onClose, onCreated }: Add
             onDateChange={setDate}
             note={note}
             onNoteChange={setNote}
+            durationInputRef={durationInputRef}
           />
 
           {mutation.isError && (
