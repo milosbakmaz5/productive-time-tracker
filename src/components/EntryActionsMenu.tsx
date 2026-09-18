@@ -1,3 +1,4 @@
+import { Loader2, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
@@ -54,16 +55,9 @@ export function EntryActionsMenu({ entryId, onDelete, isSaving }: EntryActionsMe
         className="rounded-md p-1 text-faint-foreground hover:bg-surface-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-70"
       >
         {isSaving ? (
-          <svg className="animate-spin" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
-            <path d="M14 8a6 6 0 00-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <Loader2 size={16} className="animate-spin" aria-hidden="true" />
         ) : (
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-            <circle cx="8" cy="2.5" r="1.4" />
-            <circle cx="8" cy="8" r="1.4" />
-            <circle cx="8" cy="13.5" r="1.4" />
-          </svg>
+          <MoreVertical size={16} aria-hidden="true" />
         )}
       </button>
 
@@ -77,8 +71,9 @@ export function EntryActionsMenu({ entryId, onDelete, isSaving }: EntryActionsMe
             state={{ backgroundLocation: location }}
             role="menuitem"
             onClick={() => setIsOpen(false)}
-            className="block px-3 py-1.5 text-sm text-foreground hover:bg-surface-hover"
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-foreground hover:bg-surface-hover"
           >
+            <Pencil size={14} aria-hidden="true" />
             Edit
           </Link>
           <button
@@ -88,8 +83,9 @@ export function EntryActionsMenu({ entryId, onDelete, isSaving }: EntryActionsMe
               setIsOpen(false)
               onDelete()
             }}
-            className="block w-full px-3 py-1.5 text-left text-sm text-error hover:bg-error-surface"
+            className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm text-error hover:bg-error-surface"
           >
+            <Trash2 size={14} aria-hidden="true" />
             Delete
           </button>
         </div>

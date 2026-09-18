@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { AddEntryModal } from '../components/AddEntryModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { EntryRow } from '../components/EntryRow'
-import { ThemeToggle } from '../components/ThemeToggle'
+import { SettingsMenu } from '../components/SettingsMenu'
 import { WeekDayStrip } from '../components/WeekDayStrip'
 import { WeekNav } from '../components/WeekNav'
 import { deleteTimeEntry, listTimeEntriesForRange, timeEntriesWeekQueryKey } from '../lib/api/timeEntries'
@@ -80,16 +80,7 @@ export function EntriesPage() {
         <h1 className="sr-only">Time entries</h1>
         <div className="mx-auto flex max-w-2xl items-center justify-between">
           <WeekNav weekStart={weekStart} selectedDate={date} onSelectDate={setDate} />
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <button
-              type="button"
-              onClick={logout}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground"
-            >
-              Log out
-            </button>
-          </div>
+          <SettingsMenu onLogout={logout} />
         </div>
       </header>
 

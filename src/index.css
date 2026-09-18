@@ -46,9 +46,10 @@
   --error-border: color-mix(in srgb, var(--error) 35%, var(--background));
 }
 
-/* Dark mode: follows the OS setting by default. `data-theme` on <html> (set by ThemeToggle,
- * see src/lib/theme.ts) overrides it - "light" opts out of this block even when the OS is dark,
- * and the explicit `[data-theme="dark"]` rule below opts in even when the OS is light. */
+/* Dark mode: follows the OS setting by default. `data-theme` on <html> (set by useTheme,
+ * see src/lib/theme.ts, from the settings menu's toggle) overrides it - "light" opts out of
+ * this block even when the OS is dark, and the explicit `[data-theme="dark"]` rule below opts
+ * in even when the OS is light. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --background: #05040b;

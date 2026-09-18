@@ -1,3 +1,4 @@
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRef } from 'react'
 import { today } from '../lib/format'
 import { addDays, startOfWeek, weekDays, weekRangeLabel } from '../lib/week'
@@ -42,7 +43,7 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
         title="Previous week"
         className="rounded-md p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
       >
-        <ChevronIcon direction="left" />
+        <ChevronLeft size={16} aria-hidden="true" />
       </button>
 
       <button
@@ -62,7 +63,7 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
         title="Next week"
         className="rounded-md p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground"
       >
-        <ChevronIcon direction="right" />
+        <ChevronRight size={16} aria-hidden="true" />
       </button>
 
       <div className="relative ml-1">
@@ -72,7 +73,7 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
           className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-foreground hover:bg-surface-hover"
         >
           {weekRangeLabel(weekStart)}
-          <ChevronDownIcon />
+          <ChevronDown size={14} aria-hidden="true" />
         </button>
         <input
           ref={dateInputRef}
@@ -85,22 +86,5 @@ export function WeekNav({ weekStart, selectedDate, onSelectDate }: WeekNavProps)
         />
       </div>
     </div>
-  )
-}
-
-function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
-  const d = direction === 'left' ? 'M10 3L5 8l5 5' : 'M6 3l5 5-5 5'
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d={d} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function ChevronDownIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   )
 }
