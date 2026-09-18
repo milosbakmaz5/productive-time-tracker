@@ -76,55 +76,56 @@ export function EntriesPage() {
 
   return (
     <div className="min-h-svh bg-background">
-      <header className="sticky top-0 z-20 border-b border-border bg-surface px-4 py-4 sm:px-6">
-        <h1 className="sr-only">Time entries</h1>
-        <div className="mx-auto flex max-w-2xl items-center justify-between">
-          <WeekNav weekStart={weekStart} selectedDate={date} onSelectDate={setDate} />
-          <SettingsMenu onLogout={logout} />
-        </div>
-      </header>
+      <div className="sticky top-0 z-20">
+        <header className="border-b border-border bg-surface-hover px-4 py-4 sm:px-6">
+          <h1 className="sr-only">Time entries</h1>
+          <div className="mx-auto flex items-center justify-between">
+            <WeekNav weekStart={weekStart} selectedDate={date} onSelectDate={setDate} />
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsAddOpen(true)}
+                aria-label="Add time entry"
+                className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover"
+              >
+                <span className="hidden sm:inline">+ Add time entry</span>
+                <span className="sm:hidden" aria-hidden="true">
+                  +
+                </span>
+              </button>
+              <SettingsMenu onLogout={logout} />
+            </div>
+          </div>
+        </header>
+
+        <WeekDayStrip
+          weekStart={weekStart}
+          selectedDate={date}
+          dailyTotals={dailyTotals}
+          onSelectDate={setDate}
+          isLoading={isPending}
+        />
+      </div>
 
       <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => setIsAddOpen(true)}
-            className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover"
-          >
-            + Add time entry
-          </button>
-        </div>
+        {isPending && <EntriesLoading />}
 
-        <div className="mt-4">
-          <WeekDayStrip
-            weekStart={weekStart}
-            selectedDate={date}
-            dailyTotals={dailyTotals}
-            onSelectDate={setDate}
-            isLoading={isPending}
+        {isError && (
+          <EntriesError
+            message={error instanceof Error ? error.message : 'Something went wrong.'}
+            onRetry={() => refetch()}
           />
-        </div>
+        )}
 
-        <div className="mt-4">
-          {isPending && <EntriesLoading />}
+        {!isPending && !isError && entries && entries.length === 0 && <EntriesEmpty />}
 
-          {isError && (
-            <EntriesError
-              message={error instanceof Error ? error.message : 'Something went wrong.'}
-              onRetry={() => refetch()}
-            />
-          )}
-
-          {!isPending && !isError && entries && entries.length === 0 && <EntriesEmpty />}
-
-          {!isPending && !isError && entries && entries.length > 0 && (
-            <ul className="space-y-2">
-              {entries.map((entry) => (
-                <EntryRow key={entry.id} entry={entry} onDelete={() => requestDelete(entry.id)} />
-              ))}
-            </ul>
-          )}
-        </div>
+        {!isPending && !isError && entries && entries.length > 0 && (
+          <ul className="space-y-2">
+            {entries.map((entry) => (
+              <EntryRow key={entry.id} entry={entry} onDelete={() => requestDelete(entry.id)} />
+            ))}
+          </ul>
+        )}
       </main>
 
       {isAddOpen && (

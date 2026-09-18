@@ -16,8 +16,11 @@ export function WeekDayStrip({ weekStart, selectedDate, dailyTotals, onSelectDat
   const todayDate = today()
 
   return (
-    <div className="flex gap-1.5 overflow-x-auto pb-1 sm:gap-2" aria-busy={isLoading}>
-      {days.map((day) => {
+    <div
+      className="scrollbar-none flex w-full overflow-x-auto border-b border-border bg-surface px-4 sm:px-6"
+      aria-busy={isLoading}
+    >
+      {days.map((day, index) => {
         const { weekday, dayNum } = dayLabel(day)
         const isSelected = day === selectedDate
         const isToday = day === todayDate
@@ -28,28 +31,31 @@ export function WeekDayStrip({ weekStart, selectedDate, dailyTotals, onSelectDat
             type="button"
             onClick={() => onSelectDate(day)}
             aria-current={isSelected ? 'date' : undefined}
-            className={`flex min-w-16 shrink-0 flex-col items-center gap-1 rounded-lg border px-2 py-2 transition-colors ${
-              isSelected
-                ? 'border-primary bg-primary text-white'
-                : 'border-border bg-surface text-foreground hover:bg-surface-hover'
-            }`}
+            className={`relative flex min-w-16 flex-1 shrink-0 flex-col items-center gap-1 border-b-2 py-2 text-foreground transition-colors hover:bg-surface-hover ${
+              index > 0 ? 'border-l border-l-border' : ''
+            } ${isSelected ? 'border-b-primary' : 'border-b-transparent'}`}
           >
-            <span className={`text-[11px] tabular-nums ${isSelected ? 'text-white/80' : 'text-faint-foreground'}`}>
-              {isLoading ? '--:--' : formatAsHHMM(dailyTotals[day] ?? 0)}
-            </span>
-            <span className="flex items-center gap-1 text-sm font-semibold">
+            {isToday && (
+              <span
+                className="absolute top-0 left-1/2 h-1.5 w-3 -translate-x-1/2 rounded-b-full bg-primary"
+                aria-hidden="true"
+              />
+            )}
+            <span className="text-[11px] tabular-nums text-faint-foreground">
               {weekday} {dayNum}
-              {isToday && !isSelected && <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />}
+            </span>
+            <span className="text-sm font-semibold">
+              {isLoading ? '--:--' : formatAsHHMM(dailyTotals[day] ?? 0)}
             </span>
           </button>
         )
       })}
 
-      <div className="flex min-w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border px-2 py-2">
-        <span className="text-[11px] tabular-nums text-faint-foreground">
-          = {isLoading ? '--:--' : formatAsHHMM(weeklyTotal)}
+      <div className="flex min-w-20 flex-1 shrink-0 flex-col items-center justify-center gap-1 border-l border-border bg-surface-hover py-2">
+        <span className="text-[11px] text-muted-foreground">Weekly total</span>
+        <span className="text-sm font-semibold tabular-nums text-foreground">
+          {isLoading ? '--:--' : `= ${formatAsHHMM(weeklyTotal)}`}
         </span>
-        <span className="text-center text-xs font-medium text-muted-foreground">Weekly total</span>
       </div>
     </div>
   )

@@ -69,3 +69,15 @@
   --accent: #903763;
   --error: #cd8c7f;
 }
+
+@layer utilities {
+  /* Hides the scrollbar chrome on an overflow-x-auto element without disabling scrolling itself -
+   * used on the week day strip, which scrolls horizontally on narrow screens. */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
