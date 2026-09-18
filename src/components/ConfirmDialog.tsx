@@ -1,3 +1,6 @@
+import { useRef } from 'react'
+import { useFocusTrap } from '../lib/useFocusTrap'
+
 interface ConfirmDialogProps {
   title: string
   message: string
@@ -21,17 +24,22 @@ export function ConfirmDialog({
   isConfirming,
   error,
 }: ConfirmDialogProps) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef)
+
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4"
       onClick={isConfirming ? undefined : onCancel}
     >
       <div
+        ref={dialogRef}
         role="alertdialog"
         aria-modal="true"
         aria-label={title}
+        tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-sm rounded-lg bg-surface p-6 shadow-xl"
+        className="w-full max-w-sm rounded-lg bg-surface p-6 shadow-xl outline-none"
       >
         <h2 className="text-base font-semibold text-foreground">{title}</h2>
         <p className="mt-2 text-sm text-muted-foreground">{message}</p>
